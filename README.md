@@ -8,7 +8,7 @@ uv init installector
 cd installector
 ```
 
-# Continuous setup
+# Log in
 ```bash
 cd installector
 
@@ -18,7 +18,12 @@ uv sync
 
 source .venv/bin/activate
 
-python main.py
+# inside /installector directory but outside of /store directory.
+python -m store
 ```
 
+# Log out
+```bash
+deactivate  
+```
 
