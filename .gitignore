@@ -169,3 +169,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# Environment & UV
+__pycache__
+*.pyc
+.venv
