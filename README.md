@@ -12,6 +12,8 @@ cd installector
 ```bash
 cd installector
 
+uv tree
+
 uv sync
 
 source .venv/bin/activate
