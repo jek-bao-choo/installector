@@ -39,7 +39,7 @@ class SimpleIO:
         # Initialize prompt session with history and completion
         self.session = PromptSession(
             lexer=PygmentsLexer(MarkdownLexer),  # Enable markdown syntax highlighting
-            completer=SimpleCompleter(['help', 'exit', 'clear', 'show']),  # Set available commands
+            completer=SimpleCompleter(['help', 'exit', 'clear', 'show', 'close', 'end']),  # Set available commands
         )
 
         # Store color settings for different message types
@@ -114,7 +114,7 @@ def main():
         cmd = cmd.strip()
 
         # Handle different commands
-        if cmd == 'exit':
+        if cmd in ('exit', 'close', 'end'):
             break
         elif cmd == 'help':
             # Show help text in markdown format
