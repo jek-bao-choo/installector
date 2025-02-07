@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python  # Use env to find Python interpreter in PATH for better portability
 
 # Import required libraries
 import argparse  # For parsing command line arguments
