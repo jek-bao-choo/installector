@@ -18,8 +18,8 @@ uv sync
 
 source .venv/bin/activate
 
-# inside /installector directory but outside of /store directory.
-python -m store
+# inside /installector directory but outside of /server directory.
+python -m server
 ```
 
 # Log out
