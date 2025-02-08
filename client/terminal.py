@@ -10,7 +10,7 @@ from rich.text import Text  # For styled text output
 from rich.live import Live  # For live-updating output
 
 
-class SimpleCompleter(Completer):
+class AutoCompleter(Completer):
     """Simple completer that completes from a list of words"""
 
     def __init__(self, words):
@@ -26,7 +26,7 @@ class SimpleCompleter(Completer):
                 yield Completion(cmd, start_position=-len(word))
 
 
-class SimpleIO:
+class SimpleTerminal:
     def __init__(self,
                  user_color="blue",
                  error_color="red",
@@ -37,7 +37,7 @@ class SimpleIO:
         # Initialize prompt session with history and completion
         self.session = PromptSession(
             lexer=PygmentsLexer(MarkdownLexer),  # Enable markdown syntax highlighting
-            completer=SimpleCompleter(['help', 'exit', 'clear', 'show', 'close', 'end']),  # Set available commands
+            completer=AutoCompleter(['help', 'exit', 'clear', 'show', 'close', 'end']),  # Set available commands
         )
 
         # Store color settings for different message types
@@ -48,7 +48,7 @@ class SimpleIO:
     def get_input(self, prompt="> "):
         """Get input from user with completion and history"""
         try:
-            # Get input with prompt toolkit's advanced features
+            # Get input with prompt toolkit advanced features
             return self.session.prompt(prompt)
         except KeyboardInterrupt:
             # Handle Ctrl+C gracefully
@@ -97,12 +97,12 @@ def main():
     args = parser.parse_args()
 
     # Initialize IO handler
-    io = SimpleIO()
+    io = SimpleTerminal()
 
     # Main interaction loop
     while True:
         # Get user input with custom prompt
-        cmd = io.get_input("demo> ")
+        cmd = io.get_input("installector> ")
 
         # Skip if no input (Ctrl+C/D)
         if not cmd:
@@ -119,7 +119,9 @@ def main():
             io.show_markdown("""
 # Available Commands
 - `help`: Show this help
-- `exit`: Exit the program
+- `exit`: Exit/close/end the program
+- `close`: Exit/close/end the program
+- `end`: Exit/close/end the program
 - `clear`: Clear the screen
 - `show`: Show a demo of different outputs
             """)
