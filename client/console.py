@@ -2,6 +2,7 @@
 import argparse  # For parsing command line arguments
 from prompt_toolkit import PromptSession  # For enhanced command line input
 from prompt_toolkit.completion import Completer, Completion  # For command auto-completion
+from client.message_broker import MessageBroker  # For handling chat messages
 from prompt_toolkit.lexers import PygmentsLexer  # For syntax highlighting
 from pygments.lexers import MarkdownLexer  # For markdown syntax highlighting
 from rich.console import Console  # For rich text and formatting in terminal
@@ -33,6 +34,7 @@ class SimpleTerminal:
                  warning_color="yellow"):
         # Initialize rich console for formatted output
         self.console = Console()
+        self.message_broker = MessageBroker()
 
         # Initialize prompt session with history and completion
         self.session = PromptSession(
@@ -123,40 +125,14 @@ def main():
 - `close`: Exit/close/end the program
 - `end`: Exit/close/end the program
 - `clear`: Clear the screen
-- `show`: Show a demo of different outputs
             """)
         elif cmd == 'clear':
             # Clear the terminal screen
             io.console.clear()
-        elif cmd == 'show':
-            # Demo different types of output
-            io.show_output("This is normal output")
-            io.show_error("This is an error message")
-            io.show_warning("This is a warning message")
-
-            # Demo streaming output with generator function
-            def stream_demo():
-                for i in range(5):
-                    yield f"Streaming line {i + 1}..."
-
-            io.show_streaming_output(stream_demo())
-
-            # Demo markdown rendering capabilities
-            io.show_markdown("""
-# Markdown Demo
-This is *italic* and **bold**
-
-- List item 1
-- List item 2
-
-```python
-def hello():
-    print("Hello, world!")
-```
-            """)
         else:
-            # Show error for unknown commands
-            io.show_error(f"Unknown command: {cmd}")
+            # Send message to broker and stream response
+            io.message_broker.add_message(cmd)
+            io.show_streaming_output(io.message_broker.get_response())
 
 
 # Standard Python idiom for running main() when script is executed
