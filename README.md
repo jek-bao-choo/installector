@@ -20,6 +20,8 @@ source .venv/bin/activate
 
 # inside /installector directory but outside of /server directory.
 python -m server
+
+python -m client.console
 ```
 
 # Log out
