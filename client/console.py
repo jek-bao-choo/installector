@@ -1,48 +1,53 @@
-# Import required libraries
-import argparse  # For parsing command line arguments
-from prompt_toolkit import PromptSession  # For enhanced command line input
-from prompt_toolkit.completion import Completer, Completion  # For command auto-completion
-from client.message_broker import MessageBroker  # For handling chat messages
-from prompt_toolkit.lexers import PygmentsLexer  # For syntax highlighting
-from pygments.lexers import MarkdownLexer  # For markdown syntax highlighting
-from rich.console import Console  # For rich text and formatting in terminal
-from rich.markdown import Markdown  # For rendering markdown
-from rich.text import Text  # For styled text output
-from rich.live import Live  # For live-updating output
+# Import standard library for command line argument parsing
+import argparse
+# Import prompt_toolkit for enhanced command line interface
+from prompt_toolkit import PromptSession
+# Import completion utilities for command auto-completion
+from prompt_toolkit.completion import Completer, Completion
+# Import message handling functionality
+from client.message_broker import MessageBroker
+# Import syntax highlighting utilities
+from prompt_toolkit.lexers import PygmentsLexer
+from pygments.lexers import MarkdownLexer
+# Import rich library components for terminal formatting
+from rich.console import Console
+from rich.markdown import Markdown
+from rich.text import Text
+from rich.live import Live
 
 
+# Define custom autocomplete class
 class AutoCompleter(Completer):
     """Simple completer that completes from a list of words"""
-
     def __init__(self, words):
-        # Store the list of words to use for completion
+        # Store list of available commands for completion
         self.words = words
 
     def get_completions(self, document, complete_event):
-        # Get the word being typed
+        # Get the partial word the user is typing
         word = document.get_word_before_cursor()
-        # Yield completions for commands that match the current word
+        # Check each command if it matches the partial word
         for cmd in self.words:
             if cmd.startswith(word):
+                # Yield matching commands as completion options
                 yield Completion(cmd, start_position=-len(word))
 
 
+# Define main terminal interface class
 class SimpleTerminal:
-    def __init__(self,
-                 user_color="blue",
-                 error_color="red",
-                 warning_color="yellow"):
+    def __init__(self, user_color="blue", error_color="red", warning_color="yellow"):
         # Initialize rich console for formatted output
         self.console = Console()
+        # Create message broker instance
         self.message_broker = MessageBroker()
 
-        # Initialize prompt session with history and completion
+        # Set up prompt session with markdown highlighting and command completion
         self.session = PromptSession(
-            lexer=PygmentsLexer(MarkdownLexer),  # Enable markdown syntax highlighting
-            completer=AutoCompleter(['help', 'exit', 'clear', 'show', 'close', 'end']),  # Set available commands
+            lexer=PygmentsLexer(MarkdownLexer),
+            completer=AutoCompleter(['help', 'exit', 'clear', 'show', 'close', 'end']),
         )
 
-        # Store color settings for different message types
+        # Store color preferences for different message types
         self.user_color = user_color
         self.error_color = error_color
         self.warning_color = warning_color
