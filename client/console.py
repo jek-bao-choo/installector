@@ -86,10 +86,11 @@ class SimpleTerminal:
 
     def show_streaming_output(self, generator):
         """Show streaming output with live updates"""
-        # Create live display that updates in real-time
+        accumulated_text = ""
         with Live(refresh_per_second=4) as live:
             for content in generator:
-                live.update(Text(content))
+                accumulated_text += content
+                live.update(Text(accumulated_text))
 
 
 def main():
