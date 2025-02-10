@@ -57,10 +57,10 @@ class SystemTelemetryDetection:
     def _setup_logging(self) -> logging.Logger:
         logger = logging.getLogger("SystemTelemetryCollector")
         logger.setLevel(logging.INFO)
-        # Add file handler for persistent logging
-        fh = logging.FileHandler('system_detection.log')
-        fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
-        logger.addHandler(fh)
+        # Add stream handler for console output instead of file
+        sh = logging.StreamHandler()
+        sh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        logger.addHandler(sh)
         return logger
 
     def get_os_info(self) -> Dict:
