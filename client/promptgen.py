@@ -62,6 +62,9 @@ def format_prompt(message_history: List[Dict[str, str]], system_info: Optional[D
             if not isinstance(message, dict) or 'role' not in message or 'content' not in message:
                 raise PromptGenerationError("Invalid message format in history")
 
+        # Get formatted system information
+        system_context = format_system_info(system_info)
+
         # Define the base prompt template
         base_prompt = {
             "role": "system",
