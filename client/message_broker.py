@@ -8,9 +8,10 @@ class MessageBrokerError(Exception):
 
 # Define MessageBroker class to manage conversation history and LLM interaction
 class MessageBroker:
-    def __init__(self, max_history: int = 100):
+    def __init__(self, system_info: dict = None, max_history: int = 100):
         self.message_history: List[Dict[str, str]] = []
         self.max_history = max_history
+        self.system_info = system_info
     
     def add_message(self, content: str, role: str = "user") -> None:
         """Add a message to the conversation history"""
@@ -35,6 +36,6 @@ class MessageBroker:
             raise MessageBrokerError("No messages in history to generate response from")
         
         # Format messages with prompt template before sending to LLM
-        formatted_messages = format_prompt(self.message_history)
+        formatted_messages = format_prompt(self.message_history, self.system_info)
         print("***DEBUG get_llm_response: ", formatted_messages)
         return get_llm_response(formatted_messages)
