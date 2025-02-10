@@ -246,16 +246,16 @@ class SystemTelemetryDetection:
         try:
             with ThreadPoolExecutor() as executor:
                 future_os = executor.submit(self.get_os_info)
+                future_terminal = executor.submit(self.get_terminal_info)
                 future_k8s = executor.submit(self.check_kubernetes)
                 future_services = executor.submit(self.get_running_services)
-                future_terminal = executor.submit(self.get_terminal_info)
 
                 try:
                     self.system_info = {
                         "os_info": future_os.result(timeout=self.timeout_seconds),
+                        "terminal_info": future_terminal.result(timeout=self.timeout_seconds),
                         "kubernetes_info": future_k8s.result(timeout=self.timeout_seconds),
-                        "running_services": future_services.result(timeout=self.timeout_seconds),
-                        "terminal_info": future_terminal.result(timeout=self.timeout_seconds)
+                        "running_services": future_services.result(timeout=self.timeout_seconds)
                     }
                 except TimeoutError:
                     self.logger.error("System information collection timed out")
