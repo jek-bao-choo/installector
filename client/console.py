@@ -1,7 +1,9 @@
 # Import standard library for command line argument parsing
 import argparse
+import json
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
+from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
 from typing import Optional
 # Import completion utilities for command auto-completion
 from prompt_toolkit.completion import Completer, Completion
@@ -40,17 +42,50 @@ class SimpleTerminal:
         self.console = Console()
         # Create message broker instance
         self.message_broker = MessageBroker()
+        
+        # Initialize and run system detection
+        self.system_info = self._collect_system_info()
+        
+        # Set initial system context for the LLM
+        self._set_system_context()
 
         # Set up prompt session with markdown highlighting and command completion
         self.session = PromptSession(
             lexer=PygmentsLexer(MarkdownLexer),
-            completer=AutoCompleter(['help', 'exit', 'clear', 'show', 'close', 'end']),
+            completer=AutoCompleter(['help', 'exit', 'clear', 'show', 'close', 'end', 'system']),
         )
 
         # Store color preferences for different message types
         self.user_color = user_color
         self.error_color = error_color
         self.warning_color = warning_color
+
+    def _collect_system_info(self) -> dict:
+        """Collect system information during initialization"""
+        try:
+            self.console.print("Collecting system information...", style="yellow")
+            detector = SystemTelemetryDetection()
+            system_info = detector.collect_all()
+            self.console.print("System information collected successfully.", style="green")
+            return system_info
+        except SystemDetectionError as e:
+            self.console.print(f"Warning: System detection partial failure: {str(e)}", style="yellow")
+            return {}
+        except Exception as e:
+            self.console.print(f"Warning: Could not collect system information: {str(e)}", style="yellow")
+            return {}
+
+    def _set_system_context(self):
+        """Set initial system context for the LLM"""
+        if self.system_info:
+            context = (
+                "System Information:\n"
+                f"OS: {self.system_info.get('os_info', {}).get('system', 'Unknown')}\n"
+                f"Distribution: {self.system_info.get('os_info', {}).get('distro', 'Unknown')}\n"
+                f"Terminal: {self.system_info.get('terminal_info', {}).get('terminal_type', 'Unknown')}\n"
+                f"Kubernetes: {'Available' if self.system_info.get('kubernetes_info', {}).get('kubectl_available') else 'Not Available'}\n"
+            )
+            self.message_broker.add_message(content=context, role="system")
 
     def get_input(self, prompt="> ") -> Optional[str]:
         """Get input from user with completion and history"""
@@ -130,9 +165,13 @@ def main():
                     - `close`: Exit/close/end the program
                     - `end`: Exit/close/end the program
                     - `clear`: Clear the screen
+                    - `system`: Show detected system information
                     """)
                 elif cmd == 'clear':
                     io.console.clear()
+                elif cmd == 'system':
+                    io.show_markdown("# System Information")
+                    io.console.print(json.dumps(io.system_info, indent=2))
                 else:
                     try:
                         io.message_broker.add_message(cmd)
