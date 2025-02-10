@@ -46,6 +46,18 @@ def format_system_info(system_info: Optional[Dict] = None) -> str:
             except Exception as e:
                 raise PromptGenerationError(f"Error formatting Kubernetes info: {str(e)}")
 
+        # Extract Running Services info
+        if running_services := system_info.get('running_services_info', []):
+            try:
+                if running_services:
+                    system_details.append("\nDetected Services:")
+                    for service in running_services:
+                        name = service.get('name', 'Unknown')
+                        pid = service.get('pid', 'N/A')
+                        system_details.append(f"- {name} (PID: {pid})")
+            except Exception as e:
+                raise PromptGenerationError(f"Error formatting running services info: {str(e)}")
+
         return '\n'.join(system_details)
     except Exception as e:
         raise PromptGenerationError(f"Error processing system information: {str(e)}")
