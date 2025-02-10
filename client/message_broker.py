@@ -25,9 +25,12 @@ class MessageBroker:
             "role": role,
             "content": content
         })
+
+        print("***DEBUG self.message_history.append: ", self.message_history)
     
     def get_response(self) -> Generator[str, None, None]:
         """Get streaming response from LLM"""
         if not self.message_history:
             raise MessageBrokerError("No messages in history to generate response from")
+        print("***DEBUG get_llm_response: ", self.message_history)
         return get_llm_response(self.message_history)
