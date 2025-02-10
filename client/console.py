@@ -40,12 +40,13 @@ class SimpleTerminal:
     def __init__(self, user_color="blue", error_color="red", warning_color="yellow"):
         # Initialize rich console for formatted output
         self.console = Console()
-        # Create message broker instance with system info
+        
+        # Initialize and run system detection FIRST
+        self.system_info = self._collect_system_info()
+        
+        # THEN create message broker instance with system info
         self.message_broker = MessageBroker(system_info=self.system_info)
         
-        # Initialize and run system detection
-        self.system_info = self._collect_system_info()
-
         # Set up prompt session with markdown highlighting and command completion
         self.session = PromptSession(
             lexer=PygmentsLexer(MarkdownLexer),
