@@ -4,8 +4,7 @@ import argparse
 from prompt_toolkit import PromptSession
 # Import completion utilities for command auto-completion
 from prompt_toolkit.completion import Completer, Completion
-# Import message handling functionality
-from client.message_broker import MessageBroker
+from client.message_broker import MessageBroker, MessageBrokerError
 # Import syntax highlighting utilities
 from prompt_toolkit.lexers import PygmentsLexer
 from pygments.lexers import MarkdownLexer
@@ -52,16 +51,18 @@ class SimpleTerminal:
         self.error_color = error_color
         self.warning_color = warning_color
 
-    def get_input(self, prompt="> "):
+    def get_input(self, prompt="> ") -> Optional[str]:
         """Get input from user with completion and history"""
         try:
-            # Get input with prompt toolkit advanced features
             return self.session.prompt(prompt)
         except KeyboardInterrupt:
-            # Handle Ctrl+C gracefully
+            self.show_warning("\nOperation cancelled by user")
             return None
         except EOFError:
-            # Handle Ctrl+D gracefully
+            self.show_warning("\nExit signal received")
+            return None
+        except Exception as e:
+            self.show_error(f"Input error: {str(e)}")
             return None
 
     def show_output(self, message, style=None):
@@ -91,56 +92,65 @@ class SimpleTerminal:
 
     def show_streaming_output(self, generator):
         """Show streaming output with live updates"""
-        accumulated_text = ""
-        with Live(refresh_per_second=4) as live:
-            for content in generator:
-                accumulated_text += content
-                live.update(Text(accumulated_text))
+        try:
+            accumulated_text = ""
+            with Live(refresh_per_second=4) as live:
+                for content in generator:
+                    accumulated_text += content
+                    live.update(Text(accumulated_text))
+        except Exception as e:
+            self.show_error(f"Output error: {str(e)}")
 
 
 def main():
-    # Parse command line arguments
-    parser = argparse.ArgumentParser(description="Simple terminal IO demo")
-    parser.add_argument('--no-color', action='store_true', help='Disable colors')
-    args = parser.parse_args()
+    try:
+        parser = argparse.ArgumentParser(description="Simple terminal IO demo")
+        parser.add_argument('--no-color', action='store_true', help='Disable colors')
+        args = parser.parse_args()
 
-    # Initialize IO handler
-    io = SimpleTerminal()
+        io = SimpleTerminal()
 
-    # Main interaction loop
-    while True:
-        # Get user input with custom prompt
-        cmd = io.get_input("installector> ")
+        while True:
+            try:
+                cmd = io.get_input("installector> ")
 
-        # Skip if no input (Ctrl+C/D)
-        if not cmd:
-            continue
+                if not cmd:
+                    continue
 
-        # Remove leading/trailing whitespace
-        cmd = cmd.strip()
+                cmd = cmd.strip()
 
-        # Handle different commands
-        if cmd in ('exit', 'close', 'end'):
-            break
-        elif cmd == 'help':
-            # Show help text in markdown format
-            io.show_markdown("""
-# Available Commands
-- `help`: Show this help
-- `exit`: Exit/close/end the program
-- `close`: Exit/close/end the program
-- `end`: Exit/close/end the program
-- `clear`: Clear the screen
-            """)
-        elif cmd == 'clear':
-            # Clear the terminal screen
-            io.console.clear()
-        else:
-            # Send message to broker and stream response
-            io.message_broker.add_message(cmd)
-            io.show_streaming_output(io.message_broker.get_response())
+                if cmd in ('exit', 'close', 'end'):
+                    break
+                elif cmd == 'help':
+                    io.show_markdown("""
+                    # Available Commands
+                    - `help`: Show this help
+                    - `exit`: Exit/close/end the program
+                    - `close`: Exit/close/end the program
+                    - `end`: Exit/close/end the program
+                    - `clear`: Clear the screen
+                    """)
+                elif cmd == 'clear':
+                    io.console.clear()
+                else:
+                    try:
+                        io.message_broker.add_message(cmd)
+                        io.show_streaming_output(io.message_broker.get_response())
+                    except MessageBrokerError as e:
+                        io.show_error(f"Message broker error: {str(e)}")
+                    except Exception as e:
+                        io.show_error(f"Error processing command: {str(e)}")
 
+            except Exception as e:
+                io.show_error(f"Command processing error: {str(e)}")
+                continue
 
-# Standard Python idiom for running main() when script is executed
+    except KeyboardInterrupt:
+        print("\nShutting down gracefully...")
+    except Exception as e:
+        print(f"Fatal error: {str(e)}")
+        return 1
+    return 0
+
 if __name__ == "__main__":
-    main()
+    exit(main())
