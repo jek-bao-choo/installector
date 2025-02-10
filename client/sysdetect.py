@@ -8,7 +8,6 @@ import distro  # For detailed Linux distribution info
 import logging
 from pathlib import Path
 import json
-import time
 from functools import wraps
 import signal
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
