@@ -45,9 +45,6 @@ class SimpleTerminal:
         
         # Initialize and run system detection
         self.system_info = self._collect_system_info()
-        
-        # Set initial system context for the LLM
-        self._set_system_context()
 
         # Set up prompt session with markdown highlighting and command completion
         self.session = PromptSession(
@@ -75,37 +72,6 @@ class SimpleTerminal:
             self.console.print(f"Warning: Could not collect system information: {str(e)}", style="yellow")
             return {}
 
-    def _set_system_context(self):
-        """Set initial system context for the LLM"""
-        if self.system_info:
-            # Get Kubernetes info
-            k8s_info = self.system_info.get('kubernetes_info', {})
-            k8s_status = 'Not Available'
-            k8s_version = 'N/A'
-            helm_status = 'Not Available'
-            helm_version = 'N/A'
-            
-            if k8s_info.get('kubectl_available'):
-                k8s_status = 'Available'
-                k8s_version = str(k8s_info.get('kubectl_version', 'Unknown Version'))
-            
-            if k8s_info.get('helm_available'):
-                helm_status = 'Available'
-                helm_version = str(k8s_info.get('helm_version', 'Unknown Version'))
-
-            context = (
-                "System Information:\n"
-                f"OS: {self.system_info.get('os_info', {}).get('system', 'Unknown')} "
-                f"(Version: {self.system_info.get('os_info', {}).get('version', 'Unknown')})\n"
-                f"Distribution: {self.system_info.get('os_info', {}).get('distro', 'Unknown')} "
-                f"(Version: {self.system_info.get('os_info', {}).get('version', 'Unknown')})\n"
-                f"Terminal: {self.system_info.get('terminal_info', {}).get('terminal_type', 'Unknown')} "
-                f"(Program: {self.system_info.get('terminal_info', {}).get('terminal_program', 'Unknown')}, "
-                f"Version: {self.system_info.get('terminal_info', {}).get('terminal_version', 'Unknown')})\n"
-                f"Kubernetes: {k8s_status} (Version: {k8s_version})\n"
-                f"Helm: {helm_status} (Version: {helm_version})\n"
-            )
-            self.message_broker.add_message(content=context, role="system")
 
     def get_input(self, prompt="> ") -> Optional[str]:
         """Get input from user with completion and history"""
