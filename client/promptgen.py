@@ -18,9 +18,9 @@ def format_system_info(system_info: Optional[Dict] = None) -> str:
                 system = os_info.get('system', 'Unknown')
                 version = os_info.get('version', 'Unknown')
                 distro = os_info.get('distro', 'Unknown')
-                system_details.append(f"OS: {system} (Version: {version})")
+                system_details.append(f"OS Info: {system} (Version: {version})")
                 if distro != 'Unknown':
-                    system_details.append(f"Distribution: {distro}")
+                    system_details.append(f"OS Distribution Info: {distro}")
             except Exception as e:
                 raise PromptGenerationError(f"Error formatting OS info: {str(e)}")
 
@@ -30,7 +30,7 @@ def format_system_info(system_info: Optional[Dict] = None) -> str:
                 term_type = terminal_info.get('terminal_type', 'Unknown')
                 term_program = terminal_info.get('terminal_program', 'Unknown')
                 term_version = terminal_info.get('terminal_version', 'Unknown')
-                system_details.append(f"Terminal: {term_type} (Program: {term_program}, Version: {term_version})")
+                system_details.append(f"Terminal Info: {term_type} (Program: {term_program}, Version: {term_version})")
             except Exception as e:
                 raise PromptGenerationError(f"Error formatting terminal info: {str(e)}")
 
@@ -41,8 +41,8 @@ def format_system_info(system_info: Optional[Dict] = None) -> str:
                 k8s_version = k8s_info.get('kubectl_version', 'N/A')
                 helm_status = 'Available' if k8s_info.get('helm_available') else 'Not Available'
                 helm_version = k8s_info.get('helm_version', 'N/A')
-                system_details.append(f"Kubernetes: {k8s_status} (Version: {k8s_version})")
-                system_details.append(f"Helm: {helm_status} (Version: {helm_version})")
+                system_details.append(f"Kubernetes Info: {k8s_status} (Version: {k8s_version})")
+                system_details.append(f"Helm Info: {helm_status} (Version: {helm_version})")
             except Exception as e:
                 raise PromptGenerationError(f"Error formatting Kubernetes info: {str(e)}")
 
@@ -50,7 +50,7 @@ def format_system_info(system_info: Optional[Dict] = None) -> str:
         if running_services := system_info.get('running_services_info', []):
             try:
                 if running_services:
-                    system_details.append("\nDetected Services:")
+                    system_details.append("\nDetected Services Info:")
                     for service in running_services:
                         name = service.get('name', 'Unknown')
                         pid = service.get('pid', 'N/A')

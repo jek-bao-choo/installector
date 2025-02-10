@@ -254,7 +254,7 @@ class SystemTelemetryDetection:
                         "os_info": future_os.result(timeout=self.timeout_seconds),
                         "terminal_info": future_terminal.result(timeout=self.timeout_seconds),
                         "kubernetes_info": future_k8s.result(timeout=self.timeout_seconds),
-                        "running_services": future_services.result(timeout=self.timeout_seconds)
+                        "running_services_info": future_services.result(timeout=self.timeout_seconds)
                     }
                 except TimeoutError:
                     self.logger.error("System information collection timed out")
