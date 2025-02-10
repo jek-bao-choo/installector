@@ -8,40 +8,87 @@ import distro  # For detailed Linux distribution info
 import logging
 from pathlib import Path
 import json
+import time
+from functools import wraps
+import signal
+from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from typing import Dict, List, Optional
+
+class SystemDetectionError(Exception):
+    """Base exception for system detection errors"""
+    pass
+
+class PermissionDeniedError(SystemDetectionError):
+    """Raised when permissions are insufficient"""
+    pass
+
+class TimeoutError(SystemDetectionError):
+    """Raised when an operation takes too long"""
+    pass
+
+def timeout_handler(signum, frame):
+    raise TimeoutError("Operation timed out")
+
+def with_timeout(seconds):
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            # Set the timeout handler
+            signal.signal(signal.SIGALRM, timeout_handler)
+            signal.alarm(seconds)
+            try:
+                result = func(*args, **kwargs)
+            finally:
+                # Disable the alarm
+                signal.alarm(0)
+            return result
+        return wrapper
+    return decorator
 
 
 class SystemTelemetryDetection:
     def __init__(self):
         self.system_info = {}
         self.logger = self._setup_logging()
+        self.timeout_seconds = 30  # Default timeout for operations
 
     def _setup_logging(self) -> logging.Logger:
         logger = logging.getLogger("SystemTelemetryCollector")
         logger.setLevel(logging.INFO)
+        # Add file handler for persistent logging
+        fh = logging.FileHandler('system_detection.log')
+        fh.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
+        logger.addHandler(fh)
         return logger
 
     def get_os_info(self) -> Dict:
         """Collect OS distribution and version information."""
-        os_info = {
-            "system": platform.system(),
-            "machine": platform.machine(),
-            "platform": platform.platform(),
-        }
+        try:
+            os_info = {
+                "system": platform.system(),
+                "machine": platform.machine(),
+                "platform": platform.platform(),
+            }
 
-        # Get specific distribution info for Linux
-        if platform.system() == "Linux":
-            os_info.update({
-                "distro": distro.name(True),
-                "version": distro.version(True),
-                "codename": distro.codename()
-            })
-        elif platform.system() == "Darwin":  # macOS
-            os_info["version"] = platform.mac_ver()[0]
-        elif platform.system() == "Windows":
-            os_info["version"] = platform.win32_ver()[0]
+            if platform.system() == "Linux":
+                try:
+                    os_info.update({
+                        "distro": distro.name(True),
+                        "version": distro.version(True),
+                        "codename": distro.codename()
+                    })
+                except PermissionError as e:
+                    self.logger.error(f"Permission denied accessing Linux distribution info: {e}")
+                    raise PermissionDeniedError("Cannot access Linux distribution information")
+            elif platform.system() == "Darwin":
+                os_info["version"] = platform.mac_ver()[0]
+            elif platform.system() == "Windows":
+                os_info["version"] = platform.win32_ver()[0]
 
-        return os_info
+            return os_info
+        except Exception as e:
+            self.logger.error(f"Error getting OS info: {e}")
+            raise SystemDetectionError(f"Failed to get OS information: {str(e)}")
 
     def check_kubernetes(self) -> Dict:
         """Check for Kubernetes/kubectl and get version information."""
