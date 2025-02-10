@@ -2,6 +2,7 @@
 import argparse
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
+from typing import Optional
 # Import completion utilities for command auto-completion
 from prompt_toolkit.completion import Completer, Completion
 from client.message_broker import MessageBroker, MessageBrokerError
