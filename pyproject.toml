@@ -9,4 +9,6 @@ dependencies = [
     "prompt-toolkit>=3.0.50",
     "pygments>=2.19.1",
     "rich>=13.9.4",
+    "psutil>=5.9.0",
+    "distro>=1.8.0",
 ]
