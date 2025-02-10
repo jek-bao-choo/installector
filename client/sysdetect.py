@@ -12,7 +12,9 @@ import time
 from functools import wraps
 import signal
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Tuple
+import shutil
+import sys
 
 class SystemDetectionError(Exception):
     """Base exception for system detection errors"""
@@ -188,14 +190,81 @@ class SystemTelemetryDetection:
             self.logger.warning(f"Permission denied accessing {path}")
         return log_files
 
+    def get_terminal_info(self) -> Dict[str, Optional[str]]:
+        """Collect information about the terminal environment."""
+        terminal_info = {
+            "terminal_type": None,
+            "terminal_size": None,
+            "terminal_encoding": None,
+            "is_interactive": None,
+            "color_support": None,
+            "terminal_program": None,
+            "shell": None
+        }
+
+        try:
+            # Get terminal type
+            terminal_info["terminal_type"] = os.environ.get("TERM")
+            
+            # Get terminal size
+            try:
+                columns, lines = shutil.get_terminal_size()
+                terminal_info["terminal_size"] = f"{columns}x{lines}"
+            except (AttributeError, ValueError):
+                pass
+
+            # Get terminal encoding
+            terminal_info["terminal_encoding"] = sys.stdout.encoding
+
+            # Check if running in interactive mode
+            terminal_info["is_interactive"] = sys.stdin.isatty()
+
+            # Detect color support
+            terminal_info["color_support"] = sys.stdout.isatty()
+
+            # Get terminal program
+            terminal_info["terminal_program"] = os.environ.get("TERM_PROGRAM")
+
+            # Get current shell
+            terminal_info["shell"] = os.environ.get("SHELL")
+
+            # Additional environment variables that might be useful
+            if os.environ.get("COLORTERM"):
+                terminal_info["color_term"] = os.environ.get("COLORTERM")
+            
+            if os.environ.get("TERM_PROGRAM_VERSION"):
+                terminal_info["terminal_version"] = os.environ.get("TERM_PROGRAM_VERSION")
+
+        except Exception as e:
+            self.logger.error(f"Error getting terminal information: {e}")
+            raise SystemDetectionError(f"Failed to get terminal information: {str(e)}")
+
+        return terminal_info
+
     def collect_all(self) -> Dict:
         """Collect all system information."""
-        self.system_info = {
-            "os_info": self.get_os_info(),
-            "kubernetes_info": self.check_kubernetes(),
-            "running_services": self.get_running_services(),
-            # "log_locations": self.get_log_locations()
-        }
+        try:
+            with ThreadPoolExecutor() as executor:
+                future_os = executor.submit(self.get_os_info)
+                future_k8s = executor.submit(self.check_kubernetes)
+                future_services = executor.submit(self.get_running_services)
+                future_terminal = executor.submit(self.get_terminal_info)
+
+                try:
+                    self.system_info = {
+                        "os_info": future_os.result(timeout=self.timeout_seconds),
+                        "kubernetes_info": future_k8s.result(timeout=self.timeout_seconds),
+                        "running_services": future_services.result(timeout=self.timeout_seconds),
+                        "terminal_info": future_terminal.result(timeout=self.timeout_seconds)
+                    }
+                except TimeoutError:
+                    self.logger.error("System information collection timed out")
+                    raise SystemDetectionError("Operation timed out while collecting system information")
+
+        except Exception as e:
+            self.logger.error(f"Error collecting system information: {e}")
+            raise SystemDetectionError(f"Failed to collect system information: {str(e)}")
+
         return self.system_info
 
 
