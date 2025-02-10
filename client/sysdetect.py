@@ -194,7 +194,7 @@ class SystemTelemetryDetection:
             "os_info": self.get_os_info(),
             "kubernetes_info": self.check_kubernetes(),
             "running_services": self.get_running_services(),
-            "log_locations": self.get_log_locations()
+            # "log_locations": self.get_log_locations()
         }
         return self.system_info
 
