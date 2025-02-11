@@ -6,14 +6,14 @@ class VendorManager:
         self.console = console
         # Define options in categories
         self.categories = {
-            "# Instrument an Observability vendor:": [
+            "# Instrument an Observability Vendor:": [
                 "AppDynamics",
                 "Datadog",
                 "Dynatrace",
                 "Grafana",
                 "Splunk"
             ],
-            "# Or troubleshoot an Infrastructure vendor:": [
+            "# Or troubleshoot an Infrastructure Platform:": [
                 "Amazon EKS",
                 "Azure AKS", 
                 "Google GKE",
