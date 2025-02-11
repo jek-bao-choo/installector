@@ -12,6 +12,7 @@ from functools import wraps
 import signal
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
 from typing import Dict, List, Optional, Tuple
+from rich.console import Console
 import shutil
 import sys
 
@@ -239,6 +240,24 @@ class SystemTelemetryDetection:
             raise SystemDetectionError(f"Failed to get terminal information: {str(e)}")
 
         return terminal_info
+
+    def collect_system_info(self, console: Optional['Console'] = None) -> dict:
+        """Collect system information during initialization"""
+        try:
+            if console:
+                console.print("Collecting system information...", style="yellow")
+            system_info = self.collect_all()
+            if console:
+                console.print("System information collected successfully.", style="green")
+            return system_info
+        except SystemDetectionError as e:
+            if console:
+                console.print(f"Warning: System detection partial failure: {str(e)}", style="yellow")
+            return {}
+        except Exception as e:
+            if console:
+                console.print(f"Warning: Could not collect system information: {str(e)}", style="yellow")
+            return {}
 
     def collect_all(self) -> Dict:
         """Collect all system information."""

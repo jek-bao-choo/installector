@@ -49,7 +49,8 @@ class SimpleTerminal:
         self.vendor_manager = VendorManager(self.console)
 
         # Initialize and run system detection FIRST
-        self.system_info = self._collect_system_info()
+        detector = SystemTelemetryDetection()
+        self.system_info = detector.collect_system_info(self.console)
 
         # THEN create message broker instance with system info
         self.message_broker = MessageBroker(system_info=self.system_info)
@@ -67,20 +68,6 @@ class SimpleTerminal:
 
         
 
-    def _collect_system_info(self) -> dict:
-        """Collect system information during initialization"""
-        try:
-            self.console.print("Collecting system information...", style="yellow")
-            detector = SystemTelemetryDetection()
-            system_info = detector.collect_all()
-            self.console.print("System information collected successfully.", style="green")
-            return system_info
-        except SystemDetectionError as e:
-            self.console.print(f"Warning: System detection partial failure: {str(e)}", style="yellow")
-            return {}
-        except Exception as e:
-            self.console.print(f"Warning: Could not collect system information: {str(e)}", style="yellow")
-            return {}
 
 
     def get_input(self, prompt="> ") -> Optional[str]:
