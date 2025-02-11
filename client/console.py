@@ -65,9 +65,6 @@ class SimpleTerminal:
         self.error_color = error_color
         self.warning_color = warning_color
 
-        
-
-
 
     def get_input(self, prompt="> ") -> Optional[str]:
         """Get input from user with completion and history"""
