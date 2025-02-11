@@ -45,14 +45,14 @@ class SimpleTerminal:
         # Initialize rich console for formatted output
         self.console = Console()
         
-        # Initialize and run system detection FIRST
-        self.system_info = self._collect_system_info()
-        
-        # THEN create message broker instance with system info
-        self.message_broker = MessageBroker(system_info=self.system_info)
-        
         # Initialize vendor manager
         self.vendor_manager = VendorManager(self.console)
+
+        # Initialize and run system detection FIRST
+        self.system_info = self._collect_system_info()
+
+        # THEN create message broker instance with system info
+        self.message_broker = MessageBroker(system_info=self.system_info)
         
         # Set up prompt session with markdown highlighting and command completion
         self.session = PromptSession(
