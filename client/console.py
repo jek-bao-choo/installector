@@ -7,6 +7,7 @@ from prompt_toolkit.shortcuts import radiolist_dialog
 from prompt_toolkit.styles import Style
 from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
 from typing import Optional
+from client.vendormanager import VendorManager
 # Import completion utilities for command auto-completion
 from prompt_toolkit.completion import Completer, Completion
 from server.message_broker import MessageBroker, MessageBrokerError
@@ -41,12 +42,7 @@ class AutoCompleter(Completer):
 # Define main terminal interface class
 class SimpleTerminal:
     def __init__(self, user_color="blue", error_color="red", warning_color="yellow"):
-        # Store color preferences for different message types
-        self.user_color = user_color
-        self.error_color = error_color
-        self.warning_color = warning_color
-
-        # Initialize console
+        # Initialize rich console for formatted output
         self.console = Console()
         
         # Initialize and run system detection FIRST
@@ -55,36 +51,20 @@ class SimpleTerminal:
         # THEN create message broker instance with system info
         self.message_broker = MessageBroker(system_info=self.system_info)
         
+        # Initialize vendor manager
+        self.vendor_manager = VendorManager(self.console)
+        
         # Set up prompt session with markdown highlighting and command completion
         self.session = PromptSession(
             lexer=PygmentsLexer(MarkdownLexer),
             completer=AutoCompleter(['help', 'exit', 'clear', 'show', 'close', 'end', 'system']),
         )
 
-    def select_vendor(self) -> Optional[str]:
-        """Show simple vendor selection in terminal"""
-        vendors = ["Datadog", "Splunk", "Grafana", "Dynatrace", "AppDynamics", "Exit"]
-        
-        self.show_markdown("# Select Observability Vendor")
-        for idx, vendor in enumerate(vendors, 1):
-            self.console.print(f"{idx}. {vendor}")
-        
-        while True:
-            choice = self.get_input("\nEnter number (1-6): ")
-            if not choice:
-                return None
-            
-            try:
-                choice_idx = int(choice)
-                if 1 <= choice_idx <= len(vendors):
-                    selected = vendors[choice_idx - 1]
-                    if selected == "Exit":
-                        return None
-                    return selected.lower()
-                else:
-                    self.show_error("Invalid selection. Please enter a number between 1 and 6.")
-            except ValueError:
-                self.show_error("Please enter a valid number.")
+        # Store color preferences for different message types
+        self.user_color = user_color
+        self.error_color = error_color
+        self.warning_color = warning_color
+
         
 
     def _collect_system_info(self) -> dict:
@@ -162,8 +142,8 @@ def main():
 
         io = SimpleTerminal()
         
-        # Show simple vendor selector
-        selected_vendor = io.select_vendor()
+        # Show simple vendor selector using vendor manager
+        selected_vendor = io.vendor_manager.select_vendor()
         
         # Exit if no vendor selected
         if not selected_vendor:
