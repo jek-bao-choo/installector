@@ -125,19 +125,26 @@ def main():
 
         io = SimpleTerminal()
         
-        # Show simple vendor selector using vendor manager
-        selected_vendor = io.vendor_manager.select_vendor()
+        # Show selection menu using vendor manager
+        selection = io.vendor_manager.select_option()
         
-        # Exit if no vendor selected
-        if not selected_vendor:
+        # Exit if no selection made
+        if not selection:
             return 0
         
-        # Add selected vendor to system info
-        io.system_info['selected_vendor'] = selected_vendor
+        # Determine type based on selection
+        if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
+            mode_type = 'vendor'
+        else:
+            mode_type = 'platform'
+        
+        # Add selection to system info
+        io.system_info['mode_type'] = mode_type
+        io.system_info[f'selected_{mode_type}'] = selection
 
         while True:
             try:
-                cmd = io.get_input(f"{selected_vendor}> ")
+                cmd = io.get_input(f"{selection}> ")
 
                 if not cmd:
                     continue
