@@ -21,7 +21,6 @@ from rich.text import Text
 from rich.live import Live
 
 
-
 # Define custom autocomplete class
 class AutoCompleter(Completer):
     """Simple completer that completes from a list of words"""
