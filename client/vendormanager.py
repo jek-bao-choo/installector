@@ -4,7 +4,7 @@ from rich.console import Console
 class VendorManager:
     def __init__(self, console: Console):
         self.console = console
-        self.vendors = ["Datadog", "Splunk", "Grafana", "Dynatrace", "AppDynamics", "Exit"]
+        self.vendors = ["AppDynamics", "Datadog", "Dynatrace", "Grafana", "Splunk", "exit"]
 
     def select_vendor(self) -> Optional[str]:
         """Show simple vendor selection in terminal"""
@@ -21,7 +21,7 @@ class VendorManager:
                 choice_idx = int(choice)
                 if 1 <= choice_idx <= len(self.vendors):
                     selected = self.vendors[choice_idx - 1]
-                    if selected == "Exit":
+                    if selected == "exit":
                         return None
                     return selected.lower()
                 else:
