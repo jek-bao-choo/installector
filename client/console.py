@@ -7,7 +7,7 @@ from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
 from typing import Optional
 # Import completion utilities for command auto-completion
 from prompt_toolkit.completion import Completer, Completion
-from client.message_broker import MessageBroker, MessageBrokerError
+from server.message_broker import MessageBroker, MessageBrokerError
 # Import syntax highlighting utilities
 from prompt_toolkit.lexers import PygmentsLexer
 from pygments.lexers import MarkdownLexer

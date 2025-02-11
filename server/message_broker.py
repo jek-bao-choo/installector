@@ -38,4 +38,4 @@ class MessageBroker:
         # Format messages with prompt template before sending to LLM
         formatted_messages = format_prompt(self.message_history, self.system_info)
         print("***DEBUG get_llm_response: ", formatted_messages)
-        return get_llm_response(formatted_messages)
+        # return get_llm_response(formatted_messages)
