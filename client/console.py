@@ -41,8 +41,25 @@ class AutoCompleter(Completer):
 # Define main terminal interface class
 class SimpleTerminal:
     def __init__(self, user_color="blue", error_color="red", warning_color="yellow"):
+        # Store color preferences for different message types
+        self.user_color = user_color
+        self.error_color = error_color
+        self.warning_color = warning_color
+
+        # Initialize console
         self.console = Console()
         
+        # Initialize and run system detection FIRST
+        self.system_info = self._collect_system_info()
+        
+        # THEN create message broker instance with system info
+        self.message_broker = MessageBroker(system_info=self.system_info)
+        
+        # Set up prompt session with markdown highlighting and command completion
+        self.session = PromptSession(
+            lexer=PygmentsLexer(MarkdownLexer),
+            completer=AutoCompleter(['help', 'exit', 'clear', 'show', 'close', 'end', 'system']),
+        )
 
     def select_vendor(self) -> Optional[str]:
         """Show simple vendor selection in terminal"""
@@ -69,22 +86,6 @@ class SimpleTerminal:
             except ValueError:
                 self.show_error("Please enter a valid number.")
         
-        # Initialize and run system detection FIRST
-        self.system_info = self._collect_system_info()
-        
-        # THEN create message broker instance with system info
-        self.message_broker = MessageBroker(system_info=self.system_info)
-        
-        # Set up prompt session with markdown highlighting and command completion
-        self.session = PromptSession(
-            lexer=PygmentsLexer(MarkdownLexer),
-            completer=AutoCompleter(['help', 'exit', 'clear', 'show', 'close', 'end', 'system']),
-        )
-
-        # Store color preferences for different message types
-        self.user_color = user_color
-        self.error_color = error_color
-        self.warning_color = warning_color
 
     def _collect_system_info(self) -> dict:
         """Collect system information during initialization"""
