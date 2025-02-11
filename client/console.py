@@ -20,35 +20,6 @@ from rich.text import Text
 from rich.live import Live
 
 
-class VendorSelector:
-    def __init__(self):
-        self.vendors = [
-            ("datadog", "Datadog"),
-            ("splunk", "Splunk"),
-            ("grafana", "Grafana"),
-            ("dynatrace", "Dynatrace"),
-            ("appdynamics", "AppDynamics"),
-            ("exit", "Exit")
-        ]
-        
-        self.style = Style.from_dict({
-            'dialog': 'bg:#4444ff',
-            'dialog.body': 'bg:#ffffff #000000',
-            'dialog.border': '#004400',
-            'selected': 'bg:#ff0000 #ffffff',
-            'radio-selected': 'bg:#ff0000',
-        })
-
-    def show_selector(self) -> str:
-        """Show vendor selection dialog and return selected vendor"""
-        result = radiolist_dialog(
-            title="Select Observability Vendor",
-            text="Use arrow keys to select a vendor and press Enter:",
-            values=self.vendors,
-            style=self.style
-        ).run()
-        
-        return result
 
 # Define custom autocomplete class
 class AutoCompleter(Completer):
@@ -70,6 +41,32 @@ class AutoCompleter(Completer):
 # Define main terminal interface class
 class SimpleTerminal:
     def __init__(self, user_color="blue", error_color="red", warning_color="yellow"):
+        
+    def select_vendor(self) -> Optional[str]:
+        """Show simple vendor selection in terminal"""
+        vendors = ["Datadog", "Splunk", "Grafana", "Dynatrace", "AppDynamics", "Exit"]
+        
+        self.show_markdown("# Select Observability Vendor")
+        for idx, vendor in enumerate(vendors, 1):
+            self.console.print(f"{idx}. {vendor}")
+        
+        while True:
+            choice = self.get_input("\nEnter number (1-6): ")
+            if not choice:
+                return None
+            
+            try:
+                choice_idx = int(choice)
+                if 1 <= choice_idx <= len(vendors):
+                    selected = vendors[choice_idx - 1]
+                    if selected == "Exit":
+                        return None
+                    return selected.lower()
+                else:
+                    self.show_error("Invalid selection. Please enter a number between 1 and 6.")
+            except ValueError:
+                self.show_error("Please enter a valid number.")
+                
         # Initialize rich console for formatted output
         self.console = Console()
         
@@ -163,15 +160,14 @@ def main():
         parser.add_argument('--no-color', action='store_true', help='Disable colors')
         args = parser.parse_args()
 
-        # Show vendor selector first
-        vendor_selector = VendorSelector()
-        selected_vendor = vendor_selector.show_selector()
-        
-        # Exit if user selected exit or closed the dialog
-        if not selected_vendor or selected_vendor == "exit":
-            return 0
-
         io = SimpleTerminal()
+        
+        # Show simple vendor selector
+        selected_vendor = io.select_vendor()
+        
+        # Exit if no vendor selected
+        if not selected_vendor:
+            return 0
         
         # Add selected vendor to system info
         io.system_info['selected_vendor'] = selected_vendor
