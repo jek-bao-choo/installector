@@ -8,6 +8,7 @@ from prompt_toolkit.styles import Style
 from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
 from typing import Optional
 from client.main_menu import MainMenu
+from client.obs_menu import ObsMenu
 # Import completion utilities for command auto-completion
 from prompt_toolkit.completion import Completer, Completion
 from server.message_broker import MessageBroker, MessageBrokerError
@@ -135,16 +136,29 @@ def main():
         # Determine type based on selection
         if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
             mode_type = 'vendor'
+            # Show observability operations menu for vendors
+            obs_menu = ObsMenu(io.console, selection)
+            operation = obs_menu.select_option()
+            if not operation:
+                return 0
+            # Add both vendor and operation to system info
+            io.system_info['mode_type'] = mode_type
+            io.system_info['selected_vendor'] = selection
+            io.system_info['selected_operation'] = operation
         else:
             mode_type = 'platform'
-        
-        # Add selection to system info
-        io.system_info['mode_type'] = mode_type
-        io.system_info[f'selected_{mode_type}'] = selection
+            io.system_info['mode_type'] = mode_type
+            io.system_info['selected_platform'] = selection
 
         while True:
             try:
-                cmd = io.get_input(f"{selection}> ")
+                # Update prompt to show operation for vendors
+                if mode_type == 'vendor':
+                    prompt = f"{selection}({operation})> "
+                else:
+                    prompt = f"{selection}> "
+                    
+                cmd = io.get_input(prompt)
 
                 if not cmd:
                     continue
