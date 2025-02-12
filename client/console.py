@@ -4,7 +4,7 @@ import json
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
 from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
-from typing import Optional
+from typing import Optional, Tuple
 from client.main_menu import MainMenu
 from client.obs_menu import ObsMenu
 # Import completion utilities for command auto-completion
@@ -98,6 +98,85 @@ class SimpleTerminal:
         # Print warning message with warning color
         self.console.print(Text(message, style=self.warning_color))
 
+    def handle_vendor_selection(self, selection: str) -> Tuple[str, Optional[str]]:
+        """Handle vendor selection and operations menu"""
+        mode_type = 'vendor'
+        # Show observability operations menu for vendors
+        obs_menu = ObsMenu(self.console, selection)
+        obs_operation = obs_menu.select_option()
+        if not obs_operation:
+            return mode_type, None
+        if obs_operation == "menu":
+            return mode_type, "menu"
+        
+        # Add both vendor and operation to system info
+        self.system_info['mode_type'] = mode_type
+        self.system_info['selected_vendor'] = selection
+        self.system_info['selected_operation'] = obs_operation
+        
+        # Automatically trigger the installation steps
+        try:
+            self.message_broker.add_message("")  # Empty message to trigger the prompt
+            self.show_streaming_output(self.message_broker.get_response())
+        except MessageBrokerError as e:
+            self.show_error(f"Message broker error: {str(e)}")
+        except Exception as e:
+            self.show_error(f"Error processing command: {str(e)}")
+        
+        return mode_type, obs_operation
+
+    def handle_command_loop(self, mode_type: str, selection: str, obs_operation: Optional[str] = None) -> bool:
+        """Handle the command prompt loop. Returns True if should return to main menu"""
+        while True:
+            try:
+                # Update prompt to show operation for vendors
+                if mode_type == 'vendor':
+                    prompt = f"{obs_operation}_{selection}_agent> "
+                else:
+                    prompt = f"{selection}> "
+                    
+                cmd = self.get_input(prompt)
+
+                if not cmd:
+                    continue
+
+                cmd = cmd.strip()
+
+                if cmd in ('exit', 'close', 'end'):
+                    return False  # Exit program
+                elif cmd in ('home', 'main', 'menu'):
+                    return True  # Return to main menu
+                elif cmd == 'help':
+                    self.show_markdown("""
+                    # Available Commands
+                    - `help`: Show this help
+                    - `exit`: Exit/close/end the program
+                    - `close`: Exit/close/end the program
+                    - `end`: Exit/close/end the program
+                    - `clear`: Clear the screen
+                    - `system`: Show detected system information
+                    - `menu`: Return to main menu
+                    - `main`: Return to main menu
+                    - `home`: Return to main menu
+                    """)
+                elif cmd == 'clear':
+                    self.console.clear()
+                elif cmd == 'system':
+                    self.show_markdown("# System Information")
+                    self.console.print(json.dumps(self.system_info, indent=2))
+                else:
+                    try:
+                        self.message_broker.add_message(cmd)
+                        self.show_streaming_output(self.message_broker.get_response())
+                    except MessageBrokerError as e:
+                        self.show_error(f"Message broker error: {str(e)}")
+                    except Exception as e:
+                        self.show_error(f"Error processing command: {str(e)}")
+
+            except Exception as e:
+                self.show_error(f"Command processing error: {str(e)}")
+                continue
+
     def show_markdown(self, markdown_text):
         """Show formatted markdown content"""
         # Convert markdown to rich format and print
@@ -124,7 +203,7 @@ def main():
 
         io = SimpleTerminal()
         
-        while True:  # Add main loop here
+        while True:  # Main loop
             # Show selection menu using vendor manager
             selection = io.vendor_manager.select_option()
             
@@ -134,83 +213,21 @@ def main():
             
             # Determine type based on selection
             if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
-                mode_type = 'vendor'
-                # Show observability operations menu for vendors
-                obs_menu = ObsMenu(io.console, selection)
-                obs_operation = obs_menu.select_option()
+                mode_type, obs_operation = io.handle_vendor_selection(selection)
                 if not obs_operation:
                     return 0
                 if obs_operation == "menu":
-                    continue  # Go back to main menu
-                
-                # Add both vendor and operation to system info
-                io.system_info['mode_type'] = mode_type
-                io.system_info['selected_vendor'] = selection
-                io.system_info['selected_operation'] = obs_operation
-                
-                # Automatically trigger the installation steps
-                try:
-                    io.message_broker.add_message("")  # Empty message to trigger the prompt
-                    io.show_streaming_output(io.message_broker.get_response())
-                except MessageBrokerError as e:
-                    io.show_error(f"Message broker error: {str(e)}")
-                except Exception as e:
-                    io.show_error(f"Error processing command: {str(e)}")
+                    continue
             else:
                 mode_type = 'platform'
                 io.system_info['mode_type'] = mode_type
                 io.system_info['selected_platform'] = selection
+                obs_operation = None
 
-            # Command prompt loop
-            while True:
-                try:
-                    # Update prompt to show operation for vendors
-                    if mode_type == 'vendor':
-                        prompt = f"{obs_operation}_{selection}_agent> "
-                    else:
-                        prompt = f"{selection}> "
-                        
-                    cmd = io.get_input(prompt)
-
-                    if not cmd:
-                        continue
-
-                    cmd = cmd.strip()
-
-                    if cmd in ('exit', 'close', 'end'):
-                        return 0
-                    elif cmd in ('home', 'main', 'menu'):
-                        break  # Break inner loop to return to main menu
-                    elif cmd == 'help':
-                        io.show_markdown("""
-                        # Available Commands
-                        - `help`: Show this help
-                        - `exit`: Exit/close/end the program
-                        - `close`: Exit/close/end the program
-                        - `end`: Exit/close/end the program
-                        - `clear`: Clear the screen
-                        - `system`: Show detected system information
-                        - `menu`: Return to main menu
-                        - `main`: Return to main menu
-                        - `home`: Return to main menu
-                        """)
-                    elif cmd == 'clear':
-                        io.console.clear()
-                    elif cmd == 'system':
-                        io.show_markdown("# System Information")
-                        io.console.print(json.dumps(io.system_info, indent=2))
-                    else:
-                        try:
-                            io.message_broker.add_message(cmd)
-                            io.show_streaming_output(io.message_broker.get_response())
-                        except MessageBrokerError as e:
-                            io.show_error(f"Message broker error: {str(e)}")
-                        except Exception as e:
-                            io.show_error(f"Error processing command: {str(e)}")
-
-                except Exception as e:
-                    io.show_error(f"Command processing error: {str(e)}")
-                    continue
+            # Handle command loop
+            should_continue = io.handle_command_loop(mode_type, selection, obs_operation)
+            if not should_continue:
+                return 0
 
     except KeyboardInterrupt:
         print("\nShutting down gracefully...")
