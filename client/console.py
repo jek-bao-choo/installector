@@ -100,7 +100,7 @@ class SimpleTerminal:
 
     def handle_vendor_selection(self, selection: str) -> Tuple[str, Optional[str]]:
         """Handle vendor selection and operations menu"""
-        mode_type = 'vendor'
+        mode_type = 'observability'
         # Show observability operations menu for vendors
         obs_menu = ObsMenu(self.console, selection)
         obs_operation = obs_menu.select_option()
@@ -129,8 +129,8 @@ class SimpleTerminal:
         """Handle the command prompt loop. Returns True if should return to main menu"""
         while True:
             try:
-                # Update prompt to show operation for vendors
-                if mode_type == 'vendor':
+                # Update prompt to show operation for observability mode
+                if mode_type == 'observability':
                     prompt = f"{obs_operation}_{selection}_agent> "
                 else:
                     prompt = f"{selection}> "
@@ -214,13 +214,16 @@ def main():
             
             # Determine type based on selection
             if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
-                mode_type, obs_operation = io.handle_vendor_selection(selection)
+                mode_type = 'observability'
+                # Show observability operations menu for vendors
+                obs_menu = ObsMenu(io.console, selection)
+                obs_operation = obs_menu.select_option()
                 if not obs_operation:
                     return 0
                 if obs_operation == "menu":
                     continue
             else:
-                mode_type = 'platform'
+                mode_type = 'infrastructure'
                 io.system_info['mode_type'] = mode_type
                 io.system_info['selected_platform'] = selection
                 obs_operation = None
