@@ -114,9 +114,10 @@ class SimpleTerminal:
         self.system_info['selected_vendor'] = selection
         self.system_info['selected_operation'] = obs_operation
         
-        # Automatically trigger the installation steps
+        # Construct a meaningful message based on selections
         try:
-            self.message_broker.add_message("")  # Empty message to trigger the prompt
+            message = f"Please provide instructions for {obs_operation} operation of {selection} agent"
+            self.message_broker.add_message(message)
             self.show_streaming_output(self.message_broker.get_response())
         except MessageBrokerError as e:
             self.show_error(f"Message broker error: {str(e)}")
