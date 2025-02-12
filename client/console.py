@@ -7,7 +7,7 @@ from prompt_toolkit.shortcuts import radiolist_dialog
 from prompt_toolkit.styles import Style
 from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
 from typing import Optional
-from client.vendormanager import VendorManager
+from client.main_menu import MainMenu
 # Import completion utilities for command auto-completion
 from prompt_toolkit.completion import Completer, Completion
 from server.message_broker import MessageBroker, MessageBrokerError
@@ -45,7 +45,7 @@ class SimpleTerminal:
         self.console = Console()
         
         # Initialize vendor manager
-        self.vendor_manager = VendorManager(self.console)
+        self.vendor_manager = MainMenu(self.console)
 
         # Initialize and run system detection FIRST
         detector = SystemTelemetryDetection()

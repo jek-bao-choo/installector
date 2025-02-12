@@ -1,7 +1,7 @@
 from typing import Optional
 from rich.console import Console
 
-class VendorManager:
+class MainMenu:
     def __init__(self, console: Console):
         self.console = console
         # Define options in categories
