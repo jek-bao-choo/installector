@@ -17,6 +17,7 @@ class ObsMenu:
                 "Uninstall"
             ],
             "# Misc:": [
+                "menu",
                 "exit"
             ]
         }
@@ -67,6 +68,8 @@ class ObsMenu:
                     selected = self.all_options[choice_idx - 1]
                     if selected == "exit":
                         return None
+                    elif selected == "menu":
+                        return "menu"  # Special return value to trigger main menu
                     return selected.lower()
                 else:
                     self.console.print(f"Invalid selection. Please enter a number between 1 and {len(self.all_options)}.", style="red")

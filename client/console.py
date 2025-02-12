@@ -167,6 +167,29 @@ def main():
 
                 if cmd in ('exit', 'close', 'end'):
                     break
+                elif cmd in ('home', 'main', 'menu'):
+                    # Show main menu again
+                    selection = io.vendor_manager.select_option()
+                    if not selection:
+                        break
+                    
+                    # Determine type based on selection
+                    if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
+                        mode_type = 'vendor'
+                        # Show observability operations menu for vendors
+                        obs_menu = ObsMenu(io.console, selection)
+                        use_case = obs_menu.select_option()
+                        if not use_case:
+                            break
+                        # Add both vendor and operation to system info
+                        io.system_info['mode_type'] = mode_type
+                        io.system_info['selected_vendor'] = selection
+                        io.system_info['selected_use_case'] = use_case
+                    else:
+                        mode_type = 'platform'
+                        io.system_info['mode_type'] = mode_type
+                        io.system_info['selected_platform'] = selection
+                    continue
                 elif cmd == 'help':
                     io.show_markdown("""
                     # Available Commands
@@ -176,6 +199,9 @@ def main():
                     - `end`: Exit/close/end the program
                     - `clear`: Clear the screen
                     - `system`: Show detected system information
+                    - `menu`: Return to main menu
+                    - `main`: Return to main menu
+                    - `home`: Return to main menu
                     """)
                 elif cmd == 'clear':
                     io.console.clear()
