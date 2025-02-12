@@ -64,7 +64,6 @@ def format_system_info(system_info: Optional[Dict] = None) -> str:
 
 def format_prompt(message_history: List[Dict[str, str]], system_info: Optional[Dict] = None) -> List[Dict[str, str]]:
     """Format the message history with a prompt template"""
-    
     try:
         # Validate message history
         if not isinstance(message_history, list):
@@ -76,31 +75,42 @@ def format_prompt(message_history: List[Dict[str, str]], system_info: Optional[D
 
         # Get formatted system information
         system_context = format_system_info(system_info)
+        
+        # Get vendor and operation information
+        vendor = system_info.get('selected_vendor', '').capitalize() if system_info else 'Unknown'
+        operation = system_info.get('selected_use_case', '').capitalize() if system_info else 'Unknown'
 
         # Define the base prompt template
         base_prompt = {
             "role": "system",
-            "content": f"""You are a DevOps Engineer.
-Your primary focus is to guide me on installing OpenTelemetry agents according to my operating systems information.
+            "content": f"""You are a DevOps Engineer specialized in observability and monitoring.
+Your current task is to help with {operation} of {vendor} agent.
 
-Follow these guidelines:
-- Explain potential risks or considerations
-- If you're unsure about something, acknowledge it
-- Keep responses focused and practical
-
-When suggesting commands or configurations:
-- Always explain what each command does
-- Highlight any required prerequisites
-- Mention any necessary permissions or security considerations
-
-Operating System information:
+System Environment:
 {system_context}
 
-Based on this information:
-- Recommend appropriate OpenTelemetry installation methods
-- Suggest specific configurations for the detected environment
-- Consider any detected Kubernetes/Helm setup for deployment options
-- Adapt instructions to the specific OS and distribution"""
+Follow these guidelines for {vendor} {operation}:
+- Provide clear, step-by-step instructions
+- Include all necessary commands
+- Explain each step and its purpose
+- Consider the detected system environment
+- Include any prerequisites or dependencies
+- Mention required permissions or security considerations
+- Include verification steps to confirm success
+- Provide troubleshooting tips for common issues
+
+When providing commands:
+- Use the correct syntax for the detected OS
+- Include any required environment variables
+- Explain any configuration parameters
+- Note any system-specific considerations
+- Include proper error handling steps
+
+Based on the system information:
+- Adapt instructions to the detected OS and distribution
+- Consider any detected Kubernetes/Helm setup if relevant
+- Account for any detected services that need instrumentation
+- Provide appropriate configuration for the environment"""
         }
 
         # Start with the base prompt and user-assistant interactions
@@ -109,9 +119,11 @@ Based on this information:
             if msg["role"] in ["user", "assistant"]
         ]
 
-        # Validate final formatted messages
-        if not formatted_messages:
-            raise PromptGenerationError("No valid messages generated")
+        # Add initial instruction based on vendor and operation
+        formatted_messages.append({
+            "role": "user",
+            "content": f"Show me the steps to {operation.lower()} the {vendor} agent on my system."
+        })
 
         return formatted_messages
 

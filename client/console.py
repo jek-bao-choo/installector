@@ -147,6 +147,15 @@ def main():
                 io.system_info['mode_type'] = mode_type
                 io.system_info['selected_vendor'] = selection
                 io.system_info['selected_use_case'] = use_case
+                
+                # Automatically trigger the installation steps
+                try:
+                    io.message_broker.add_message("")  # Empty message to trigger the prompt
+                    io.show_streaming_output(io.message_broker.get_response())
+                except MessageBrokerError as e:
+                    io.show_error(f"Message broker error: {str(e)}")
+                except Exception as e:
+                    io.show_error(f"Error processing command: {str(e)}")
             else:
                 mode_type = 'platform'
                 io.system_info['mode_type'] = mode_type
