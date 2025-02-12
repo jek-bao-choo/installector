@@ -1,6 +1,5 @@
-from typing import Generator, List, Dict, Optional
-from server.llm import get_llm_response
-from client.promptgen import format_prompt
+from typing import Generator, List, Dict
+from server.promptgen import format_prompt
 
 class MessageBrokerError(Exception):
     """Base exception class for MessageBroker errors"""
