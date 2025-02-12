@@ -136,15 +136,32 @@ def main():
         # Determine type based on selection
         if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
             mode_type = 'vendor'
-            # Show observability operations menu for vendors
-            obs_menu = ObsMenu(io.console, selection)
-            use_case = obs_menu.select_option()
-            if not use_case:
-                return 0
-            # Add both vendor and operation to system info
-            io.system_info['mode_type'] = mode_type
-            io.system_info['selected_vendor'] = selection
-            io.system_info['selected_use_case'] = use_case
+            while True:  # Add a loop here to handle menu returns
+                # Show observability operations menu for vendors
+                obs_menu = ObsMenu(io.console, selection)
+                use_case = obs_menu.select_option()
+                if not use_case:
+                    return 0
+                if use_case == "menu":  # Handle the menu return value
+                    # Show main menu again
+                    selection = io.vendor_manager.select_option()
+                    if not selection:
+                        return 0
+                    
+                    # Check if new selection is a vendor or platform
+                    if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
+                        continue  # Stay in the loop for vendor selections
+                    else:
+                        mode_type = 'platform'
+                        io.system_info['mode_type'] = mode_type
+                        io.system_info['selected_platform'] = selection
+                        break  # Exit the loop for platform selections
+                else:
+                    # Add both vendor and operation to system info
+                    io.system_info['mode_type'] = mode_type
+                    io.system_info['selected_vendor'] = selection
+                    io.system_info['selected_use_case'] = use_case
+                    break  # Exit the loop for normal use case selections
         else:
             mode_type = 'platform'
             io.system_info['mode_type'] = mode_type
