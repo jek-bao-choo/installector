@@ -3,8 +3,6 @@ import argparse
 import json
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
-from prompt_toolkit.shortcuts import radiolist_dialog
-from prompt_toolkit.styles import Style
 from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
 from typing import Optional
 from client.main_menu import MainMenu
