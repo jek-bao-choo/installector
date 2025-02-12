@@ -6,14 +6,14 @@ class MainMenu:
         self.console = console
         # Define options in categories
         self.categories = {
-            "# Instrument an Observability Vendor:": [
+            "# Manage an Observability Vendor agent:": [
                 "AppDynamics",
                 "Datadog",
                 "Dynatrace",
                 "Grafana",
                 "Splunk"
             ],
-            "# Or troubleshoot an Infrastructure Platform:": [
+            "# Or manage an Infrastructure Vendor platform:": [
                 "Amazon EKS",
                 "Azure AKS", 
                 "Google GKE",

@@ -9,7 +9,7 @@ class ObsMenu:
         self.options = [
             "Install",
             "Upgrade",
-            "Migrate",
+            "Migrate2",
             "Configure", 
             "Troubleshoot",
             "Uninstall",
@@ -37,7 +37,7 @@ class ObsMenu:
 
     def select_option(self) -> Optional[str]:
         """Show observability operations menu"""
-        self.console.print(f"\n# {self.vendor.capitalize()} Operations:", style="bold")
+        self.console.print(f"\n# {self.vendor.capitalize()} agent use cases:", style="bold")
         
         # Print numbered options
         for idx, option in enumerate(self.options, 1):

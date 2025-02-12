@@ -138,13 +138,13 @@ def main():
             mode_type = 'vendor'
             # Show observability operations menu for vendors
             obs_menu = ObsMenu(io.console, selection)
-            operation = obs_menu.select_option()
-            if not operation:
+            use_case = obs_menu.select_option()
+            if not use_case:
                 return 0
             # Add both vendor and operation to system info
             io.system_info['mode_type'] = mode_type
             io.system_info['selected_vendor'] = selection
-            io.system_info['selected_operation'] = operation
+            io.system_info['selected_use_case'] = use_case
         else:
             mode_type = 'platform'
             io.system_info['mode_type'] = mode_type
@@ -154,7 +154,7 @@ def main():
             try:
                 # Update prompt to show operation for vendors
                 if mode_type == 'vendor':
-                    prompt = f"{selection}({operation})> "
+                    prompt = f"{use_case}_{selection}_agent> "
                 else:
                     prompt = f"{selection}> "
                     
