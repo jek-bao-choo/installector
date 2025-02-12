@@ -166,6 +166,7 @@ class SimpleTerminal:
                     self.console.print(json.dumps(self.system_info, indent=2))
                 else:
                     try:
+                        print("***DEBUG add_message(cmd)", cmd)
                         self.message_broker.add_message(cmd)
                         self.show_streaming_output(self.message_broker.get_response())
                     except MessageBrokerError as e:
