@@ -78,7 +78,7 @@ def format_prompt(message_history: List[Dict[str, str]], system_info: Optional[D
         
         # Get vendor and operation information
         vendor = system_info.get('selected_vendor', '').capitalize() if system_info else 'Unknown'
-        operation = system_info.get('selected_use_case', '').capitalize() if system_info else 'Unknown'
+        operation = system_info.get('selected_operation', '').capitalize() if system_info else 'Unknown'
 
         # Define the base prompt template
         base_prompt = {

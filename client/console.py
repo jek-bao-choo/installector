@@ -137,16 +137,16 @@ def main():
                 mode_type = 'vendor'
                 # Show observability operations menu for vendors
                 obs_menu = ObsMenu(io.console, selection)
-                use_case = obs_menu.select_option()
-                if not use_case:
+                obs_operation = obs_menu.select_option()
+                if not obs_operation:
                     return 0
-                if use_case == "menu":
+                if obs_operation == "menu":
                     continue  # Go back to main menu
                 
                 # Add both vendor and operation to system info
                 io.system_info['mode_type'] = mode_type
                 io.system_info['selected_vendor'] = selection
-                io.system_info['selected_use_case'] = use_case
+                io.system_info['selected_operation'] = obs_operation
                 
                 # Automatically trigger the installation steps
                 try:
@@ -166,7 +166,7 @@ def main():
                 try:
                     # Update prompt to show operation for vendors
                     if mode_type == 'vendor':
-                        prompt = f"{use_case}_{selection}_agent> "
+                        prompt = f"{obs_operation}_{selection}_agent> "
                     else:
                         prompt = f"{selection}> "
                         
