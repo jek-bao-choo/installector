@@ -129,8 +129,7 @@ def format_prompt(message_history: List[Dict[str, str]], system_info: Optional[D
             raise PromptGenerationError(f"Error with vendor/operation: {str(e)}")
 
         # Define the base prompt template
-        try:
-            base_prompt = {
+        base_prompt = {
             "role": "system",
             "content": f"""You are a DevOps Engineer specialized in observability and monitoring.
 Your current task is to help with {operation} of {vendor} agent.
@@ -162,7 +161,6 @@ Based on the system information:
 - Provide appropriate configuration for the environment"""
         }
 
-        # Format messages
         try:
             formatted_messages = [base_prompt] + [
                 msg for msg in message_history 
