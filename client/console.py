@@ -174,36 +174,36 @@ def main():
                         return 0
                     elif cmd in ('home', 'main', 'menu'):
                         break  # Break inner loop to return to main menu
-                elif cmd == 'help':
-                    io.show_markdown("""
-                    # Available Commands
-                    - `help`: Show this help
-                    - `exit`: Exit/close/end the program
-                    - `close`: Exit/close/end the program
-                    - `end`: Exit/close/end the program
-                    - `clear`: Clear the screen
-                    - `system`: Show detected system information
-                    - `menu`: Return to main menu
-                    - `main`: Return to main menu
-                    - `home`: Return to main menu
-                    """)
-                elif cmd == 'clear':
-                    io.console.clear()
-                elif cmd == 'system':
-                    io.show_markdown("# System Information")
-                    io.console.print(json.dumps(io.system_info, indent=2))
-                else:
-                    try:
-                        io.message_broker.add_message(cmd)
-                        io.show_streaming_output(io.message_broker.get_response())
-                    except MessageBrokerError as e:
-                        io.show_error(f"Message broker error: {str(e)}")
-                    except Exception as e:
-                        io.show_error(f"Error processing command: {str(e)}")
+                    elif cmd == 'help':
+                        io.show_markdown("""
+                        # Available Commands
+                        - `help`: Show this help
+                        - `exit`: Exit/close/end the program
+                        - `close`: Exit/close/end the program
+                        - `end`: Exit/close/end the program
+                        - `clear`: Clear the screen
+                        - `system`: Show detected system information
+                        - `menu`: Return to main menu
+                        - `main`: Return to main menu
+                        - `home`: Return to main menu
+                        """)
+                    elif cmd == 'clear':
+                        io.console.clear()
+                    elif cmd == 'system':
+                        io.show_markdown("# System Information")
+                        io.console.print(json.dumps(io.system_info, indent=2))
+                    else:
+                        try:
+                            io.message_broker.add_message(cmd)
+                            io.show_streaming_output(io.message_broker.get_response())
+                        except MessageBrokerError as e:
+                            io.show_error(f"Message broker error: {str(e)}")
+                        except Exception as e:
+                            io.show_error(f"Error processing command: {str(e)}")
 
-            except Exception as e:
-                io.show_error(f"Command processing error: {str(e)}")
-                continue
+                except Exception as e:
+                    io.show_error(f"Command processing error: {str(e)}")
+                    continue
 
     except KeyboardInterrupt:
         print("\nShutting down gracefully...")
