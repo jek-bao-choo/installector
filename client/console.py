@@ -214,19 +214,17 @@ def main():
             
             # Determine type based on selection
             if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
-                mode_type = 'observability'
-                # Show observability operations menu for vendors
-                obs_menu = ObsMenu(io.console, selection)
-                obs_operation = obs_menu.select_option()
+                mode_type, obs_operation = io.handle_vendor_selection(selection)
                 if not obs_operation:
                     return 0
                 if obs_operation == "menu":
                     continue
             else:
                 mode_type = 'infrastructure'
+                obs_operation = None
+                # Add infrastructure selection to system info
                 io.system_info['mode_type'] = mode_type
                 io.system_info['selected_platform'] = selection
-                obs_operation = None
 
             # Handle command loop
             should_continue = io.handle_command_loop(mode_type, selection, obs_operation)
