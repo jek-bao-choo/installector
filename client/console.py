@@ -126,87 +126,54 @@ def main():
 
         io = SimpleTerminal()
         
-        # Show selection menu using vendor manager
-        selection = io.vendor_manager.select_option()
-        
-        # Exit if no selection made
-        if not selection:
-            return 0
-        
-        # Determine type based on selection
-        if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
-            mode_type = 'vendor'
-            while True:  # Add a loop here to handle menu returns
+        while True:  # Add main loop here
+            # Show selection menu using vendor manager
+            selection = io.vendor_manager.select_option()
+            
+            # Exit if no selection made
+            if not selection:
+                return 0
+            
+            # Determine type based on selection
+            if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
+                mode_type = 'vendor'
                 # Show observability operations menu for vendors
                 obs_menu = ObsMenu(io.console, selection)
                 use_case = obs_menu.select_option()
                 if not use_case:
                     return 0
-                if use_case == "menu":  # Handle the menu return value
-                    # Show main menu again
-                    selection = io.vendor_manager.select_option()
-                    if not selection:
+                if use_case == "menu":
+                    continue  # Go back to main menu
+                
+                # Add both vendor and operation to system info
+                io.system_info['mode_type'] = mode_type
+                io.system_info['selected_vendor'] = selection
+                io.system_info['selected_use_case'] = use_case
+            else:
+                mode_type = 'platform'
+                io.system_info['mode_type'] = mode_type
+                io.system_info['selected_platform'] = selection
+
+            # Command prompt loop
+            while True:
+                try:
+                    # Update prompt to show operation for vendors
+                    if mode_type == 'vendor':
+                        prompt = f"{use_case}_{selection}_agent> "
+                    else:
+                        prompt = f"{selection}> "
+                        
+                    cmd = io.get_input(prompt)
+
+                    if not cmd:
+                        continue
+
+                    cmd = cmd.strip()
+
+                    if cmd in ('exit', 'close', 'end'):
                         return 0
-                    
-                    # Check if new selection is a vendor or platform
-                    if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
-                        continue  # Stay in the loop for vendor selections
-                    else:
-                        mode_type = 'platform'
-                        io.system_info['mode_type'] = mode_type
-                        io.system_info['selected_platform'] = selection
-                        break  # Exit the loop for platform selections
-                else:
-                    # Add both vendor and operation to system info
-                    io.system_info['mode_type'] = mode_type
-                    io.system_info['selected_vendor'] = selection
-                    io.system_info['selected_use_case'] = use_case
-                    break  # Exit the loop for normal use case selections
-        else:
-            mode_type = 'platform'
-            io.system_info['mode_type'] = mode_type
-            io.system_info['selected_platform'] = selection
-
-        while True:
-            try:
-                # Update prompt to show operation for vendors
-                if mode_type == 'vendor':
-                    prompt = f"{use_case}_{selection}_agent> "
-                else:
-                    prompt = f"{selection}> "
-                    
-                cmd = io.get_input(prompt)
-
-                if not cmd:
-                    continue
-
-                cmd = cmd.strip()
-
-                if cmd in ('exit', 'close', 'end'):
-                    break
-                elif cmd in ('home', 'main', 'menu'):
-                    # Show main menu again
-                    selection = io.vendor_manager.select_option()
-                    if not selection:
-                        break
-                    
-                    # Determine type based on selection
-                    if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
-                        mode_type = 'vendor'
-                        # Show observability operations menu for vendors
-                        obs_menu = ObsMenu(io.console, selection)
-                        use_case = obs_menu.select_option()
-                        if not use_case:
-                            break
-                        # Add both vendor and operation to system info
-                        io.system_info['mode_type'] = mode_type
-                        io.system_info['selected_vendor'] = selection
-                        io.system_info['selected_use_case'] = use_case
-                    else:
-                        mode_type = 'platform'
-                        io.system_info['mode_type'] = mode_type
-                        io.system_info['selected_platform'] = selection
-                    continue
+                    elif cmd in ('home', 'main', 'menu'):
+                        break  # Break inner loop to return to main menu
                 elif cmd == 'help':
                     io.show_markdown("""
                     # Available Commands
