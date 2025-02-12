@@ -1,7 +1,7 @@
 from typing import Generator, List, Dict
 
 from server.llm import get_llm_response
-from server.promptgen import format_prompt
+from server.obs_prompt import format_prompt
 
 class MessageBrokerError(Exception):
     """Base exception class for MessageBroker errors"""
