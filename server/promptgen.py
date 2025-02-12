@@ -1,12 +1,56 @@
-from typing import List, Dict, Optional
+from typing import List, Dict, Optional, Tuple
 
 class PromptGenerationError(Exception):
     """Base exception for prompt generation errors"""
     pass
 
+class SystemInfoError(PromptGenerationError):
+    """Raised when there's an error processing system information"""
+    pass
+
+class MessageFormatError(PromptGenerationError):
+    """Raised when message format is invalid"""
+    pass
+
+class VendorOperationError(PromptGenerationError):
+    """Raised when vendor or operation information is invalid"""
+    pass
+
+def _validate_system_info(system_info: Optional[Dict]) -> None:
+    """Validate system information structure"""
+    if system_info is not None and not isinstance(system_info, dict):
+        raise SystemInfoError("System info must be a dictionary or None")
+
+def _validate_message_history(message_history: List[Dict[str, str]]) -> None:
+    """Validate message history format"""
+    if not isinstance(message_history, list):
+        raise MessageFormatError("Message history must be a list")
+    
+    for msg in message_history:
+        if not isinstance(msg, dict):
+            raise MessageFormatError("Each message must be a dictionary")
+        if 'role' not in msg or 'content' not in msg:
+            raise MessageFormatError("Messages must contain 'role' and 'content' keys")
+        if msg['role'] not in ['system', 'user', 'assistant']:
+            raise MessageFormatError(f"Invalid message role: {msg['role']}")
+
+def _validate_vendor_operation(system_info: Dict) -> Tuple[str, str]:
+    """Validate and extract vendor and operation information"""
+    vendor = system_info.get('selected_vendor', '')
+    operation = system_info.get('selected_operation', '')
+    
+    if not vendor:
+        raise VendorOperationError("No vendor selected")
+    if not operation:
+        raise VendorOperationError("No operation selected")
+    
+    return vendor.capitalize(), operation.capitalize()
+
 def format_system_info(system_info: Optional[Dict] = None) -> str:
     """Format system information into a readable string"""
     try:
+        _validate_system_info(system_info)
+        
         if not system_info:
             return "No system information available"
 
@@ -65,23 +109,28 @@ def format_system_info(system_info: Optional[Dict] = None) -> str:
 def format_prompt(message_history: List[Dict[str, str]], system_info: Optional[Dict] = None) -> List[Dict[str, str]]:
     """Format the message history with a prompt template"""
     try:
-        # Validate message history
-        if not isinstance(message_history, list):
-            raise PromptGenerationError("Message history must be a list")
-        
-        for message in message_history:
-            if not isinstance(message, dict) or 'role' not in message or 'content' not in message:
-                raise PromptGenerationError("Invalid message format in history")
+        # Validate inputs
+        _validate_message_history(message_history)
+        _validate_system_info(system_info)
 
         # Get formatted system information
-        system_context = format_system_info(system_info)
+        try:
+            system_context = format_system_info(system_info)
+        except SystemInfoError as e:
+            raise PromptGenerationError(f"Error formatting system info: {str(e)}")
         
         # Get vendor and operation information
-        vendor = system_info.get('selected_vendor', '').capitalize() if system_info else 'Unknown'
-        operation = system_info.get('selected_operation', '').capitalize() if system_info else 'Unknown'
+        try:
+            if system_info:
+                vendor, operation = _validate_vendor_operation(system_info)
+            else:
+                vendor, operation = "Unknown", "Unknown"
+        except VendorOperationError as e:
+            raise PromptGenerationError(f"Error with vendor/operation: {str(e)}")
 
         # Define the base prompt template
-        base_prompt = {
+        try:
+            base_prompt = {
             "role": "system",
             "content": f"""You are a DevOps Engineer specialized in observability and monitoring.
 Your current task is to help with {operation} of {vendor} agent.
@@ -113,21 +162,24 @@ Based on the system information:
 - Provide appropriate configuration for the environment"""
         }
 
-        # Start with the base prompt and user-assistant interactions
-        formatted_messages = [base_prompt] + [
-            msg for msg in message_history 
-            if msg["role"] in ["user", "assistant"]
-        ]
+        # Format messages
+        try:
+            formatted_messages = [base_prompt] + [
+                msg for msg in message_history 
+                if msg["role"] in ["user", "assistant"]
+            ]
 
-        # Add initial instruction based on vendor and operation
-        formatted_messages.append({
-            "role": "user",
-            "content": f"Show me the steps to {operation.lower()} the {vendor} agent on my system."
-        })
+            # Add initial instruction
+            formatted_messages.append({
+                "role": "user",
+                "content": f"Show me the steps to {operation.lower()} the {vendor} agent on my system."
+            })
+        except Exception as e:
+            raise PromptGenerationError(f"Error formatting messages: {str(e)}")
 
         return formatted_messages
 
-    except PromptGenerationError as e:
-        raise e
+    except (SystemInfoError, MessageFormatError, VendorOperationError) as e:
+        raise PromptGenerationError(str(e))
     except Exception as e:
         raise PromptGenerationError(f"Unexpected error in prompt generation: {str(e)}")
