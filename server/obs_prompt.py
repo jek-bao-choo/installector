@@ -145,9 +145,9 @@ Step X: [Brief Title]
 
 Execute this command:
 <exec>
-```bash
+<code>
 [actual command to run]
-```
+</code>
 </exec>
 
 Expected outcome:
@@ -157,9 +157,9 @@ Expected outcome:
 
 To verify the step completed successfully:
 <verify>
-```bash
+<code>
 [verification command]
-```
+</code>
 </verify>
 
 Note: Wait for confirmation after executing the command before proceeding to the next step.

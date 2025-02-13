@@ -192,35 +192,56 @@ class SimpleTerminal:
         self.console.print(md)
 
     def _format_code_block(self, text: str) -> Text:
-        """Format text to highlight code blocks with Aider-style formatting"""
+        """Format text to highlight code blocks with XML-style tags"""
         result = Text()
-        parts = text.split('```')
         
+        # Handle exec blocks
+        parts = text.split('<exec>')
         for i, part in enumerate(parts):
-            if i % 2 == 0:
-                # Regular text outside code blocks
+            if i == 0:
                 result.append(part)
             else:
-                # Code block content
-                lines = part.split('\n', 1)
-                block_type = lines[0].strip()  # Will be either 'exec' or 'verify'
-                if len(lines) > 1:
-                    code = lines[1].strip()
-                else:
-                    code = lines[0].strip()
-                
-                result.append('\n')
-                # Add green markers for code block boundaries
-                result.append('```' + block_type + '\n', style="bold green")
-                # Add command with white on black highlighting
-                result.append(code, style="bold white on black")
-                result.append('\n```\n', style="bold green")
-                
-                # Store commands based on block type
-                if block_type == 'exec':
-                    self.current_exec_command = code
-                elif block_type == 'verify':
-                    self.current_verify_command = code
+                exec_parts = part.split('</exec>')
+                if len(exec_parts) >= 1:
+                    # Extract the command between <code> tags
+                    cmd_block = exec_parts[0].strip()
+                    if '<code>' in cmd_block and '</code>' in cmd_block:
+                        cmd = cmd_block.split('<code>')[1].split('</code>')[0].strip()
+                        result.append('\n')
+                        result.append('<exec>\n', style="bold green")
+                        result.append('<code>\n', style="bold green")
+                        result.append(cmd, style="bold white on black")
+                        result.append('\n</code>', style="bold green")
+                        result.append('\n</exec>\n', style="bold green")
+                        self.current_exec_command = cmd
+                    
+                    if len(exec_parts) > 1:
+                        result.append(exec_parts[1])
+        
+        # Handle verify blocks
+        text = str(result)
+        result = Text()
+        parts = text.split('<verify>')
+        for i, part in enumerate(parts):
+            if i == 0:
+                result.append(part)
+            else:
+                verify_parts = part.split('</verify>')
+                if len(verify_parts) >= 1:
+                    # Extract the command between <code> tags
+                    cmd_block = verify_parts[0].strip()
+                    if '<code>' in cmd_block and '</code>' in cmd_block:
+                        cmd = cmd_block.split('<code>')[1].split('</code>')[0].strip()
+                        result.append('\n')
+                        result.append('<verify>\n', style="bold green")
+                        result.append('<code>\n', style="bold green")
+                        result.append(cmd, style="bold white on black")
+                        result.append('\n</code>', style="bold green")
+                        result.append('\n</verify>\n', style="bold green")
+                        self.current_verify_command = cmd
+                    
+                    if len(verify_parts) > 1:
+                        result.append(verify_parts[1])
         
         return result
 
