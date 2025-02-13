@@ -216,7 +216,7 @@ class SimpleTerminal:
         return result
 
     def _format_exec_blocks(self, text: str) -> Text:
-        """Format execution code blocks"""
+        """Format execution code blocks and store execution command"""
         result = Text()
         parts = text.split('<exec>')
         
@@ -232,7 +232,9 @@ class SimpleTerminal:
                     if cmd := self._extract_command_from_tags(cmd_block):
                         # Format and store the command
                         result.append(self._format_command_block(cmd, 'exec'))
-                        self.current_exec_command = cmd
+                        # Store the execution command for later use
+                        self.current_exec_command = cmd.strip()
+                        print("***DEBUG Captured exec command:", self.current_exec_command)  # Debug line
                     
                     # Add any remaining text after </exec>
                     if len(exec_parts) > 1:
@@ -241,7 +243,7 @@ class SimpleTerminal:
         return result
 
     def _format_verify_blocks(self, text: str) -> Text:
-        """Format verification code blocks"""
+        """Format verification code blocks and store verification command"""
         result = Text()
         parts = text.split('<verify>')
         
@@ -257,7 +259,9 @@ class SimpleTerminal:
                     if cmd := self._extract_command_from_tags(cmd_block):
                         # Format and store the command
                         result.append(self._format_command_block(cmd, 'verify'))
-                        self.current_verify_command = cmd
+                        # Store the verification command for later use
+                        self.current_verify_command = cmd.strip()
+                        print("***DEBUG Captured verify command:", self.current_verify_command)  # Debug line
                     
                     # Add any remaining text after </verify>
                     if len(verify_parts) > 1:
