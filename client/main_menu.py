@@ -20,7 +20,8 @@ class MainMenu:
                     "DataDog Agent",
                     "Dynatrace OneAgent",
                     "Grafana Agent",
-                    "Splunk OpenTelemetry Collector"
+                    "Splunk OpenTelemetry Collector",
+                    "curl"
                 ],
                 "# Or manage an Infrastructure Vendor platform:": [
                     "Amazon EKS",
