@@ -332,9 +332,3 @@ def main():
 
 if __name__ == "__main__":
     exit(main())
-    def verify_last_step(self):
-        """Verify the last executed command using stored verification command"""
-        if self.current_verify_command:
-            # Use the verification command
-            print(f"Verifying last step with: {self.current_verify_command}")
-            # ... execute verification ...
