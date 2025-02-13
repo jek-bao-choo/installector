@@ -149,7 +149,9 @@ Example response format:
 This step will [explain what this step does and why it's needed].
 
 Execute this command:
-`actual_command_here`
+```
+[actual_command_here]
+```
 
 Expected outcome:
 - What user should see if successful
