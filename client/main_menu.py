@@ -16,11 +16,11 @@ class MainMenu:
             # Define options in categories
             self.categories = {
                 "# Manage an Observability Vendor agent:": [
-                    "AppDynamics",
-                    "Datadog",
-                    "Dynatrace",
-                    "Grafana",
-                    "Splunk"
+                    "AppDynamics Server Agent",
+                    "DataDog Agent",
+                    "Dynatrace OneAgent",
+                    "Grafana Agent",
+                    "Splunk OpenTelemetry Collector"
                 ],
                 "# Or manage an Infrastructure Vendor platform:": [
                     "Amazon EKS",
@@ -54,11 +54,11 @@ class MainMenu:
 # Available Options and Commands
 
 ## Observability Vendor Options:
-- `AppDynamics`: Manage AppDynamics agent operations
-- `Datadog`: Manage Datadog agent operations
-- `Dynatrace`: Manage Dynatrace OneAgent operations
-- `Grafana`: Manage Grafana Agent operations
-- `Splunk`: Manage Splunk OpenTelemetry agent operations
+- `AppDynamics Server Agent`: Manage AppDynamics Server Agent operations
+- `DataDog Agent`: Manage DataDog Agent operations
+- `Dynatrace OneAgent`: Manage Dynatrace OneAgent operations
+- `Grafana Agent`: Manage Grafana Agent operations
+- `Splunk OpenTelemetry Collector`: Manage Splunk OpenTelemetry Collector operations
 
 ## Infrastructure Platform Options:
 - `Amazon EKS`: Manage Amazon Elastic Kubernetes Service

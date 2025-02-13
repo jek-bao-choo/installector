@@ -348,7 +348,7 @@ def main():
                 return 0
             
             # Determine type based on selection
-            if selection in ['appdynamics', 'datadog', 'dynatrace', 'grafana', 'splunk']:
+            if selection in ['appdynamics_server_agent', 'datadog_agent', 'dynatrace_oneagent', 'grafana_agent', 'splunk_opentelemetry_collector']:
                 mode_type, obs_operation = io.handle_vendor_selection(selection)
                 if not obs_operation:
                     return 0
