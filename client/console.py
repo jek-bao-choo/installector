@@ -222,14 +222,19 @@ class SimpleTerminal:
         
         for i, part in enumerate(parts):
             if i == 0:
+                # Add any text before the first <exec> tag
                 result.append(part)
             else:
-                exec_parts = part.split('</exec>')
+                # Handle text between <exec> and </exec>
+                exec_parts = part.split('</exec>', 1)  # Split only on first occurrence
                 if len(exec_parts) >= 1:
-                    if cmd := self._extract_command_from_tags(exec_parts[0].strip()):
+                    cmd_block = exec_parts[0].strip()
+                    if cmd := self._extract_command_from_tags(cmd_block):
+                        # Format and store the command
                         result.append(self._format_command_block(cmd, 'exec'))
                         self.current_exec_command = cmd
                     
+                    # Add any remaining text after </exec>
                     if len(exec_parts) > 1:
                         result.append(exec_parts[1])
         
@@ -242,14 +247,19 @@ class SimpleTerminal:
         
         for i, part in enumerate(parts):
             if i == 0:
+                # Add any text before the first <verify> tag
                 result.append(part)
             else:
-                verify_parts = part.split('</verify>')
+                # Handle text between <verify> and </verify>
+                verify_parts = part.split('</verify>', 1)  # Split only on first occurrence
                 if len(verify_parts) >= 1:
-                    if cmd := self._extract_command_from_tags(verify_parts[0].strip()):
+                    cmd_block = verify_parts[0].strip()
+                    if cmd := self._extract_command_from_tags(cmd_block):
+                        # Format and store the command
                         result.append(self._format_command_block(cmd, 'verify'))
                         self.current_verify_command = cmd
                     
+                    # Add any remaining text after </verify>
                     if len(verify_parts) > 1:
                         result.append(verify_parts[1])
         
