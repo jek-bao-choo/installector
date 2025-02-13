@@ -170,13 +170,12 @@ class SimpleTerminal:
                     self.console.clear()
                 elif cmd == 'system':
                     self.show_markdown("# System Information")
-                    # Create a copy of system_info with current commands
-                    system_info_with_commands = self.system_info.copy()
+                    # Add current commands to system info
                     if self.current_exec_command:
-                        system_info_with_commands['current_exec_command'] = self.current_exec_command
+                        self.system_info['current_exec_command'] = self.current_exec_command
                     if self.current_verify_command:
-                        system_info_with_commands['current_verify_command'] = self.current_verify_command
-                    self.console.print(json.dumps(system_info_with_commands, indent=2))
+                        self.system_info['current_verify_command'] = self.current_verify_command
+                    self.console.print(json.dumps(self.system_info, indent=2))
                 else:
                     try:
                         print("***DEBUG add_message(cmd)", cmd)
