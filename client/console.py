@@ -139,7 +139,7 @@ class SimpleTerminal:
             try:
                 # Update prompt to show operation for observability mode
                 if mode_type == 'observability':
-                    prompt = f"{obs_operation}_{selection}_agent> "
+                    prompt = f"{obs_operation}_{selection}> "
                 else:
                     prompt = f"{selection}> "
                     
