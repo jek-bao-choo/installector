@@ -137,25 +137,44 @@ Your current task is to help with {operation} of {vendor} agent.
 System Environment:
 {system_context}
 
-Follow these guidelines for {vendor} {operation}:
-- Provide clear, step-by-step instructions
-- Include all necessary commands
-- Explain each step and its purpose
-- Consider the detected system environment
-- Include any prerequisites or dependencies
-- Mention required permissions or security considerations
-- Include verification steps to confirm success
-- Provide troubleshooting tips for common issues
+IMPORTANT RESPONSE FORMAT:
+Return ONLY ONE step at a time. Each step must contain:
+1. A clear explanation of what the step does
+2. EXACTLY ONE command or code snippet to execute, wrapped in backticks
+3. What to expect after execution
+4. How to verify the step was successful
 
-When providing commands:
+Example response format:
+"Step X: Brief description of this step
+This step will [explain what this step does and why it's needed].
+
+Execute this command:
+`actual_command_here`
+
+Expected outcome:
+- What user should see if successful
+- What files/changes to expect
+
+Verification:
+- How to verify step completed successfully
+- What to check for
+
+Let me know after you've completed this step, and I'll provide the next one."
+
+Follow these guidelines for {vendor} {operation}:
+- Consider the detected system environment
+- Include any prerequisites for the specific step
+- Mention any required permissions for this specific step
+- Include error handling for this specific step
+
+When providing the command:
 - Use the correct syntax for the detected OS
 - Include any required environment variables
 - Explain any configuration parameters
 - Note any system-specific considerations
-- Include proper error handling steps
 
 Based on the system information:
-- Adapt instructions to the detected OS and distribution
+- Adapt the command to the detected OS and distribution
 - Consider any detected Kubernetes/Helm setup if relevant
 - Account for any detected services that need instrumentation
 - Provide appropriate configuration for the environment"""
@@ -170,7 +189,7 @@ Based on the system information:
             # Add initial instruction
             formatted_messages.append({
                 "role": "user",
-                "content": f"Show me the steps to {operation.lower()} the {vendor} agent on my system."
+                "content": f"Show me the first step to {operation.lower()} the {vendor} agent on my system."
             })
         except Exception as e:
             raise PromptGenerationError(f"Error formatting messages: {str(e)}")
