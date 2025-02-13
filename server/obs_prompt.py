@@ -132,7 +132,7 @@ def format_prompt(message_history: List[Dict[str, str]], system_info: Optional[D
         base_prompt = {
             "role": "system",
             "content": f"""You are a DevOps Engineer specialized in observability and monitoring.
-Your current task is to help with {operation} of {vendor} agent.
+Your current task is to help with {operation} of {vendor}.
 
 System Environment:
 {system_context}
@@ -196,7 +196,7 @@ Based on the system information:
             # Add initial instruction
             formatted_messages.append({
                 "role": "user",
-                "content": f"Show me the first step to {operation.lower()} the {vendor} agent on my system."
+                "content": f"Show me the first step to {operation.lower()} the {vendor} on my system."
             })
         except Exception as e:
             raise PromptGenerationError(f"Error formatting messages: {str(e)}")
