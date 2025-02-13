@@ -215,6 +215,20 @@ class SimpleTerminal:
         
         return result
 
+    def _get_command_confirmation(self) -> bool:
+        """Ask user to confirm if they executed the command
+        Returns True if user confirmed execution, False otherwise"""
+        while True:
+            response = self.get_input("Executed the command?  (Y)es/(N)o  [Yes]: ")
+            if response and response.lower() in ['yes', 'y', 'no', 'n']:
+                break
+            self.show_warning("Please answer Yes or No")
+        
+        if response.lower().startswith('n'):
+            self.show_warning("Please execute the command before proceeding to the next step")
+            return False
+        return True
+
     def show_streaming_output(self, generator):
         """Show streaming output with live updates and Aider-style code highlighting"""
         try:
@@ -225,16 +239,8 @@ class SimpleTerminal:
                     formatted_text = self._format_code_block(accumulated_text)
                     live.update(formatted_text)
             
-            # After showing the step, ask for confirmation
-            while True:
-                response = self.get_input("Executed the command?  (Y)es/(N)o  [Yes]: ")
-                if response and response.lower() in ['yes', 'y', 'no', 'n']:
-                    break
-                self.show_warning("Please answer Yes or No")
-            
-            # If user says No, remind them to execute the command
-            if response.lower().startswith('n'):
-                self.show_warning("Please execute the command before proceeding to the next step")
+            # Get command execution confirmation
+            self._get_command_confirmation()
                 
         except Exception as e:
             self.show_error(f"Output error: {str(e)}")
