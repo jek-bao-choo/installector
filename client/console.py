@@ -219,7 +219,16 @@ class SimpleTerminal:
         """Ask user to confirm if they executed the command
         Returns True if user confirmed execution, False otherwise"""
         while True:
-            response = self.get_input("Executed the command?  (Y)es/(N)o  [Yes]: ")
+            # Use cyan color for the prompt text, similar to Aider
+            prompt_text = Text()
+            prompt_text.append("Executed the command?  ", style="cyan")
+            prompt_text.append("(Y)es/(N)o  ", style="cyan dim")
+            prompt_text.append("[Yes]", style="cyan bold")
+            prompt_text.append(": ", style="cyan")
+            
+            self.console.print(prompt_text, end="")
+            response = self.get_input("")  # Empty prompt since we already printed it
+            
             # Handle empty input (just Enter) as Yes
             if not response or response.strip() == "":
                 return True
