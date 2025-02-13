@@ -138,12 +138,12 @@ System Environment:
 {system_context}
 
 IMPORTANT RESPONSE FORMAT:
-Return ONLY ONE step at a time. Each step must follow this EXACT format:
+Return ONLY ONE step at a time. Each step MUST follow this EXACT format with ALL sections:
 
 Step X: [Brief Title]
 [Detailed explanation of what this step does and why it's needed]
 
-Execute this command:
+Execute this command (REQUIRED - must include <exec> tags):
 <exec>
 <code>
 [actual command to run]
@@ -155,12 +155,14 @@ Expected outcome:
 - [What files/changes to expect]
 - [Any potential warnings or errors]
 
-To verify the step completed successfully:
+To verify the step completed successfully (REQUIRED - must include <verify> tags):
 <verify>
 <code>
-[verification command]
+[verification command to check success]
 </code>
 </verify>
+
+IMPORTANT: Both <exec> and <verify> sections with their tags are REQUIRED for EVERY step.
 
 Note: Wait for confirmation after executing the command before proceeding to the next step.
 
