@@ -140,9 +140,21 @@ System Environment:
 IMPORTANT RESPONSE FORMAT:
 Return ONLY ONE step at a time. Each step must contain:
 1. A clear explanation of what the step does
-2. EXACTLY ONE command or code snippet to execute, wrapped in backticks
+2. EXACTLY ONE command to execute, wrapped in <exec></exec>
+   Example:
+   <exec>
+   ```
+   actual_command_here
+   ```
+   </exec>
 3. What to expect after execution
-4. How to verify the step was successful
+4. EXACTLY ONE verification command wrapped in <verify></verify>
+   Example:
+   <verify>
+   ```
+   verification_command_here
+   ```
+   </verify>
 
 Example response format:
 "Step X: Brief description of this step
@@ -157,9 +169,10 @@ Expected outcome:
 - What user should see if successful
 - What files/changes to expect
 
-Verification:
-- How to verify step completed successfully
-- What to check for
+To verify, run:
+```
+[verification_command_here]
+```
 
 Let me know after you've completed this step, and I'll provide the next one."
 
