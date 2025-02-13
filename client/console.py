@@ -1,6 +1,7 @@
 # Import standard library for command line argument parsing
 import argparse
 import json
+import subprocess
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
 from rich.style import Style
@@ -297,7 +298,7 @@ class SimpleTerminal:
             
             # Handle empty input (just Enter) as Yes
             if not response or response.strip() == "":
-                return True
+                response = "yes"
             if response and response.lower() in ['yes', 'y', 'no', 'n']:
                 break
             self.show_warning("Please answer Yes or No")
@@ -305,6 +306,38 @@ class SimpleTerminal:
         if response.lower().startswith('n'):
             self.show_warning("Please execute the command before proceeding to the next step")
             return False
+            
+        # If user confirmed execution and we have a verify command, run it
+        if self.current_verify_command:
+            try:
+                self.show_markdown("\n## Running verification command:")
+                self.show_markdown(f"```bash\n{self.current_verify_command}\n```")
+                
+                # Execute the verification command and capture output
+                result = subprocess.run(
+                    self.current_verify_command,
+                    shell=True,
+                    capture_output=True,
+                    text=True
+                )
+                
+                # Show the command output
+                self.show_markdown("\n## Verification Results:")
+                if result.stdout:
+                    self.show_markdown("### Output:")
+                    self.show_markdown(f"```\n{result.stdout}\n```")
+                if result.stderr:
+                    self.show_markdown("### Errors:")
+                    self.show_markdown(f"```\n{result.stderr}\n```")
+                
+                # Show the return code
+                status = "✅ Success" if result.returncode == 0 else "❌ Failed"
+                self.show_markdown(f"\n**Status**: {status} (return code: {result.returncode})")
+                
+            except Exception as e:
+                self.show_error(f"\nError running verification command: {str(e)}")
+                return False
+                
         return True
 
     def show_streaming_output(self, generator):
