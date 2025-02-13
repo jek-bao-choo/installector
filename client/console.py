@@ -45,6 +45,10 @@ class SimpleTerminal:
         # Initialize rich console for formatted output
         self.console = Console()
         
+        # Track current commands
+        self.current_exec_command = None
+        self.current_verify_command = None
+        
         # Initialize vendor manager
         self.vendor_manager = MainMenu(self.console)
 
@@ -199,19 +203,24 @@ class SimpleTerminal:
             else:
                 # Code block content
                 lines = part.split('\n', 1)
+                block_type = lines[0].strip()  # Will be either 'exec' or 'verify'
                 if len(lines) > 1:
-                    lang = lines[0].strip() or 'bash'
                     code = lines[1].strip()
                 else:
-                    lang = 'bash'
                     code = lines[0].strip()
                 
                 result.append('\n')
                 # Add green markers for code block boundaries
-                result.append('```' + lang + '\n', style="bold green")
+                result.append('```' + block_type + '\n', style="bold green")
                 # Add command with white on black highlighting
                 result.append(code, style="bold white on black")
                 result.append('\n```\n', style="bold green")
+                
+                # Store commands based on block type
+                if block_type == 'exec':
+                    self.current_exec_command = code
+                elif block_type == 'verify':
+                    self.current_verify_command = code
         
         return result
 
@@ -302,3 +311,9 @@ def main():
 
 if __name__ == "__main__":
     exit(main())
+    def verify_last_step(self):
+        """Verify the last executed command using stored verification command"""
+        if self.current_verify_command:
+            # Use the verification command
+            print(f"Verifying last step with: {self.current_verify_command}")
+            # ... execute verification ...
