@@ -220,6 +220,9 @@ class SimpleTerminal:
         Returns True if user confirmed execution, False otherwise"""
         while True:
             response = self.get_input("Executed the command?  (Y)es/(N)o  [Yes]: ")
+            # Handle empty input (just Enter) as Yes
+            if not response or response.strip() == "":
+                return True
             if response and response.lower() in ['yes', 'y', 'no', 'n']:
                 break
             self.show_warning("Please answer Yes or No")
