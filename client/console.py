@@ -191,59 +191,76 @@ class SimpleTerminal:
         md = Markdown(markdown_text)
         self.console.print(md)
 
-    def _format_code_block(self, text: str) -> Text:
-        """Format text to highlight code blocks with XML-style tags"""
+    def _extract_command_from_tags(self, cmd_block: str) -> Optional[str]:
+        """Extract command from between <code> tags"""
+        if '<code>' in cmd_block and '</code>' in cmd_block:
+            return cmd_block.split('<code>')[1].split('</code>')[0].strip()
+        return None
+
+    def _format_command_block(self, cmd: str, block_type: str) -> Text:
+        """Format a command block with proper styling
+        block_type should be either 'exec' or 'verify'"""
         result = Text()
-        
-        # Handle exec blocks
+        result.append('\n')
+        # Add a separator line before command
+        result.append('─' * 80 + '\n', style="dim")
+        # Add command section header
+        header = 'Execute Command:' if block_type == 'exec' else 'Verify Command:'
+        result.append(header, style="bold cyan")
+        result.append('\n\n')
+        # Add command with syntax highlighting
+        result.append(cmd, style="bold white on black")
+        result.append('\n')
+        # Add a separator line after command
+        result.append('─' * 80 + '\n', style="dim")
+        return result
+
+    def _format_exec_blocks(self, text: str) -> Text:
+        """Format execution code blocks"""
+        result = Text()
         parts = text.split('<exec>')
+        
         for i, part in enumerate(parts):
             if i == 0:
                 result.append(part)
             else:
                 exec_parts = part.split('</exec>')
                 if len(exec_parts) >= 1:
-                    # Extract the command between <code> tags
-                    cmd_block = exec_parts[0].strip()
-                    if '<code>' in cmd_block and '</code>' in cmd_block:
-                        cmd = cmd_block.split('<code>')[1].split('</code>')[0].strip()
-                        result.append('\n')
-                        result.append('<exec>\n', style="bold green")
-                        result.append('<code>\n', style="bold green")
-                        result.append(cmd, style="bold white on black")
-                        result.append('\n</code>', style="bold green")
-                        result.append('\n</exec>\n', style="bold green")
+                    if cmd := self._extract_command_from_tags(exec_parts[0].strip()):
+                        result.append(self._format_command_block(cmd, 'exec'))
                         self.current_exec_command = cmd
                     
                     if len(exec_parts) > 1:
                         result.append(exec_parts[1])
         
-        # Handle verify blocks
-        text = str(result)
+        return result
+
+    def _format_verify_blocks(self, text: str) -> Text:
+        """Format verification code blocks"""
         result = Text()
         parts = text.split('<verify>')
+        
         for i, part in enumerate(parts):
             if i == 0:
                 result.append(part)
             else:
                 verify_parts = part.split('</verify>')
                 if len(verify_parts) >= 1:
-                    # Extract the command between <code> tags
-                    cmd_block = verify_parts[0].strip()
-                    if '<code>' in cmd_block and '</code>' in cmd_block:
-                        cmd = cmd_block.split('<code>')[1].split('</code>')[0].strip()
-                        result.append('\n')
-                        result.append('<verify>\n', style="bold green")
-                        result.append('<code>\n', style="bold green")
-                        result.append(cmd, style="bold white on black")
-                        result.append('\n</code>', style="bold green")
-                        result.append('\n</verify>\n', style="bold green")
+                    if cmd := self._extract_command_from_tags(verify_parts[0].strip()):
+                        result.append(self._format_command_block(cmd, 'verify'))
                         self.current_verify_command = cmd
                     
                     if len(verify_parts) > 1:
                         result.append(verify_parts[1])
         
         return result
+
+    def _format_code_block(self, text: str) -> Text:
+        """Format text to highlight code blocks with XML-style tags"""
+        # First format exec blocks
+        result = self._format_exec_blocks(text)
+        # Then format verify blocks using the formatted exec blocks
+        return self._format_verify_blocks(str(result))
 
     def _get_command_confirmation(self) -> bool:
         """Ask user to confirm if they executed the command
