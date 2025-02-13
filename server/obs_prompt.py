@@ -138,41 +138,31 @@ System Environment:
 {system_context}
 
 IMPORTANT RESPONSE FORMAT:
-Return ONLY ONE step at a time. Each step must contain:
-1. A clear explanation of what the step does
-2. EXACTLY ONE command to execute, wrapped in <exec></exec>
-   Example:
-   <exec>
-   ```
-   actual_command_here
-   ```
-   </exec>
-3. What to expect after execution
-4. EXACTLY ONE verification command wrapped in <verify></verify>
-   Example:
-   <verify>
-   ```
-   verification_command_here
-   ```
-   </verify>
+Return ONLY ONE step at a time. Each step must follow this EXACT format:
 
-Example response format:
-"Step X: Brief description of this step
-This step will [explain what this step does and why it's needed].
+Step X: [Brief Title]
+[Detailed explanation of what this step does and why it's needed]
 
 Execute this command:
+<exec>
+```bash
+[actual command to run]
 ```
-[actual_command_here]
-```
+</exec>
 
 Expected outcome:
-- What user should see if successful
-- What files/changes to expect
+- [What user should see if successful]
+- [What files/changes to expect]
+- [Any potential warnings or errors]
 
-To verify, run:
+To verify the step completed successfully:
+<verify>
+```bash
+[verification command]
 ```
-[verification_command_here]
-```
+</verify>
+
+Note: Wait for confirmation after executing the command before proceeding to the next step.
 
 Let me know after you've completed this step, and I'll provide the next one."
 
