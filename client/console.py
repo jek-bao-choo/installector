@@ -1,12 +1,12 @@
 # Import standard library for command line argument parsing
 import argparse
 import json
-import subprocess
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
 from rich.style import Style
 from rich.syntax import Syntax
 from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
+from client.verify_output import VerificationOutput
 from typing import Optional, Tuple
 from client.main_menu import MainMenu
 from client.obs_menu import ObsMenu
@@ -307,36 +307,10 @@ class SimpleTerminal:
             self.show_warning("Please execute the command before proceeding to the next step")
             return False
             
-        # If user confirmed execution and we have a verify command, run it
-        if self.current_verify_command:
-            try:
-                self.show_markdown("\n## Running verification command:")
-                self.show_markdown(f"```bash\n{self.current_verify_command}\n```")
-                
-                # Execute the verification command and capture output
-                result = subprocess.run(
-                    self.current_verify_command,
-                    shell=True,
-                    capture_output=True,
-                    text=True
-                )
-                
-                # Show the command output
-                self.show_markdown("\n## Verification Results:")
-                if result.stdout:
-                    self.show_markdown("### Output:")
-                    self.show_markdown(f"```\n{result.stdout}\n```")
-                if result.stderr:
-                    self.show_markdown("### Errors:")
-                    self.show_markdown(f"```\n{result.stderr}\n```")
-                
-                # Show the return code
-                status = "✅ Success" if result.returncode == 0 else "❌ Failed"
-                self.show_markdown(f"\n**Status**: {status} (return code: {result.returncode})")
-                
-            except Exception as e:
-                self.show_error(f"\nError running verification command: {str(e)}")
-                return False
+        # If user confirmed execution, run verification
+        verifier = VerificationOutput(self.console)
+        if not verifier.run_verification(self.current_verify_command):
+            return False
                 
         return True
 
