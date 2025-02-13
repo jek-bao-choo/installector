@@ -227,7 +227,7 @@ class SimpleTerminal:
             
             # After showing the step, ask for confirmation
             while True:
-                response = self.get_input("Have you executed the command? Yes or No: ")
+                response = self.get_input("Executed the command?  (Y)es/(N)o  [Yes]: ")
                 if response and response.lower() in ['yes', 'y', 'no', 'n']:
                     break
                 self.show_warning("Please answer Yes or No")
