@@ -3,6 +3,8 @@ import argparse
 import json
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
+from rich.style import Style
+from rich.syntax import Syntax
 from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
 from typing import Optional, Tuple
 from client.main_menu import MainMenu
@@ -185,14 +187,43 @@ class SimpleTerminal:
         md = Markdown(markdown_text)
         self.console.print(md)
 
+    def _format_code_block(self, text: str) -> Text:
+        """Format text to highlight code blocks with Aider-style formatting"""
+        result = Text()
+        parts = text.split('```')
+        
+        for i, part in enumerate(parts):
+            if i % 2 == 0:
+                # Regular text outside code blocks
+                result.append(part)
+            else:
+                # Code block content
+                lines = part.split('\n', 1)
+                if len(lines) > 1:
+                    lang = lines[0].strip() or 'bash'
+                    code = lines[1].strip()
+                else:
+                    lang = 'bash'
+                    code = lines[0].strip()
+                
+                result.append('\n')
+                # Add green markers for code block boundaries
+                result.append('```' + lang + '\n', style="bold green")
+                # Add command with white on black highlighting
+                result.append(code, style="bold white on black")
+                result.append('\n```\n', style="bold green")
+        
+        return result
+
     def show_streaming_output(self, generator):
-        """Show streaming output with live updates"""
+        """Show streaming output with live updates and Aider-style code highlighting"""
         try:
             accumulated_text = ""
             with Live(refresh_per_second=4) as live:
                 for content in generator:
                     accumulated_text += content
-                    live.update(Text(accumulated_text))
+                    formatted_text = self._format_code_block(accumulated_text)
+                    live.update(formatted_text)
         except Exception as e:
             self.show_error(f"Output error: {str(e)}")
 
