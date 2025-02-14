@@ -314,10 +314,28 @@ class SimpleTerminal:
 
     def _format_code_block(self, text: str) -> Text:
         """Format text to highlight code blocks with XML-style tags"""
-        # First format exec blocks
-        result = self._format_exec_blocks(text)
-        # Then format verify blocks using the formatted exec blocks
-        return self._format_verify_blocks(str(result))
+        try:
+            # First format exec blocks
+            print("\n***DEBUG _format_code_block input:", text)
+            result = self._format_exec_blocks(text)
+            if not isinstance(result, Text):
+                print("***DEBUG _format_exec_blocks returned non-Text:", type(result))
+                result = Text(str(result))
+            
+            # Then format verify blocks using the formatted exec blocks
+            result_str = str(result)
+            print("\n***DEBUG _format_code_block after exec blocks:", result_str)
+            
+            verify_result = self._format_verify_blocks(result_str)
+            if not isinstance(verify_result, Text):
+                print("***DEBUG _format_verify_blocks returned non-Text:", type(verify_result))
+                verify_result = Text(str(verify_result))
+                
+            return verify_result
+        except Exception as e:
+            print(f"***DEBUG _format_code_block error: {str(e)}")
+            # Return original text wrapped in Text object if formatting fails
+            return Text(text)
 
     def _get_command_confirmation(self) -> bool:
         """Ask user to confirm if they executed the command
@@ -360,18 +378,36 @@ class SimpleTerminal:
     def show_streaming_output(self, generator):
         """Show streaming output with live updates and Aider-style code highlighting"""
         try:
+            if not generator:
+                self.show_error("No content received from generator")
+                return
+                
             accumulated_text = ""
             with Live(refresh_per_second=4) as live:
                 for content in generator:
+                    if not isinstance(content, str):
+                        print(f"***DEBUG Unexpected content type: {type(content)}")
+                        content = str(content)
+                    
                     accumulated_text += content
-                    formatted_text = self._format_code_block(accumulated_text)
-                    live.update(formatted_text)
+                    try:
+                        formatted_text = self._format_code_block(accumulated_text)
+                        if not isinstance(formatted_text, Text):
+                            print(f"***DEBUG Unexpected formatted_text type: {type(formatted_text)}")
+                            formatted_text = Text(str(formatted_text))
+                        live.update(formatted_text)
+                    except Exception as format_error:
+                        print(f"***DEBUG Formatting error: {str(format_error)}")
+                        # Fall back to unformatted text if formatting fails
+                        live.update(Text(accumulated_text))
             
             # Get command execution confirmation
-            self._get_command_confirmation()
+            if self.last_exec_command or self.last_verify_command:
+                self._get_command_confirmation()
                 
         except Exception as e:
             self.show_error(f"Output error: {str(e)}")
+            print(f"***DEBUG show_streaming_output error: {str(e)}")
 
 
 def main():
