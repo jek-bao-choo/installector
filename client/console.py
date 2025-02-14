@@ -127,7 +127,7 @@ class SimpleTerminal:
         
         # Construct a meaningful message based on selections
         try:
-            message = f"Please provide instructions for {obs_operation} operation of {selection} agent"
+            message = f"Please provide instructions for {obs_operation} operation of {selection}"
             self.message_broker.add_message(message)
             self.show_streaming_output(self.message_broker.get_response())
         except MessageBrokerError as e:

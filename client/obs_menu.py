@@ -18,7 +18,7 @@ class ObsMenu:
             self.vendor = vendor
             # Define options in categories
             self.categories = {
-                "# Agent Operations:": [
+                "# Operations:": [
                     "Install",
                     "Upgrade",
                     "Migrate2",
@@ -87,7 +87,7 @@ class ObsMenu:
     def _print_menu(self) -> None:
         """Print the menu options"""
         try:
-            self.console.print(f"\n# {self.vendor.capitalize()} agent use cases:", style="bold")
+            self.console.print(f"\n# {self.vendor.capitalize()} use cases:", style="bold")
             
             current_index = 1
             for category, options in self.categories.items():
