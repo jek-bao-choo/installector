@@ -3,10 +3,8 @@ import argparse
 import json
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
-from rich.style import Style
-from rich.syntax import Syntax
 from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
-from client.verify_status import VerificationOutput
+from client.verify_execution import VerificationOutput
 from typing import Optional, Tuple
 from client.main_menu import MainMenu
 from client.obs_menu import ObsMenu

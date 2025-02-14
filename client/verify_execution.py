@@ -2,7 +2,7 @@ import subprocess
 import shlex
 from rich.console import Console
 from rich.markdown import Markdown
-from typing import Optional, Tuple
+from typing import Optional
 
 class VerificationError(Exception):
     """Base exception for verification errors"""

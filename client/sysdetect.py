@@ -11,7 +11,7 @@ import json
 from functools import wraps
 import signal
 from concurrent.futures import ThreadPoolExecutor, TimeoutError
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 from rich.console import Console
 import shutil
 import sys
