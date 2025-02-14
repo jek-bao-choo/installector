@@ -61,49 +61,43 @@ def format_system_info(system_info: Optional[Dict] = None) -> str:
         # Extract OS info
         if os_info := system_info.get('os_info', {}):
             try:
-                xml_parts.append('  <os_info>')
+                xml_parts.append('<os_info>')
                 system = os_info.get('system', 'Unknown')
                 version = os_info.get('version', 'Unknown')
                 distro = os_info.get('distro', 'Unknown')
-                xml_parts.append(f'    <system>{system}</system>')
-                xml_parts.append(f'    <version>{version}</version>')
+                xml_parts.append(f'<system>{system}</system>')
+                xml_parts.append(f'<version>{version}</version>')
                 if distro != 'Unknown':
-                    xml_parts.append(f'    <distribution>{distro}</distribution>')
-                xml_parts.append('  </os_info>')
+                    xml_parts.append(f'<distribution>{distro}</distribution>')
+                xml_parts.append('</os_info>')
             except Exception as e:
                 raise PromptGenerationError(f"Error formatting OS info: {str(e)}")
 
         # Extract Terminal info
         if terminal_info := system_info.get('terminal_info', {}):
             try:
-                xml_parts.append('  <terminal_info>')
+                xml_parts.append('<terminal_info>')
                 term_type = terminal_info.get('terminal_type', 'Unknown')
                 term_program = terminal_info.get('terminal_program', 'Unknown')
                 term_version = terminal_info.get('terminal_version', 'Unknown')
-                xml_parts.append(f'    <type>{term_type}</type>')
-                xml_parts.append(f'    <program>{term_program}</program>')
-                xml_parts.append(f'    <version>{term_version}</version>')
-                xml_parts.append('  </terminal_info>')
+                xml_parts.append(f'<type>{term_type}</type>')
+                xml_parts.append(f'<program>{term_program}</program>')
+                xml_parts.append(f'<version>{term_version}</version>')
+                xml_parts.append('</terminal_info>')
             except Exception as e:
                 raise PromptGenerationError(f"Error formatting terminal info: {str(e)}")
 
         # Extract Kubernetes info
         if k8s_info := system_info.get('kubernetes_info', {}):
             try:
-                xml_parts.append('  <kubernetes_info>')
+                xml_parts.append('<kubernetes_info>')
                 k8s_status = 'Available' if k8s_info.get('kubectl_available') else 'Not Available'
                 k8s_version = k8s_info.get('kubectl_version', 'N/A')
                 helm_status = 'Available' if k8s_info.get('helm_available') else 'Not Available'
                 helm_version = k8s_info.get('helm_version', 'N/A')
-                xml_parts.append(f'    <kubectl>')
-                xml_parts.append(f'      <status>{k8s_status}</status>')
-                xml_parts.append(f'      <version>{k8s_version}</version>')
-                xml_parts.append(f'    </kubectl>')
-                xml_parts.append(f'    <helm>')
-                xml_parts.append(f'      <status>{helm_status}</status>')
-                xml_parts.append(f'      <version>{helm_version}</version>')
-                xml_parts.append(f'    </helm>')
-                xml_parts.append('  </kubernetes_info>')
+                xml_parts.append(f'<kubectl><status>{k8s_status}</status><version>{k8s_version}</version></kubectl>')
+                xml_parts.append(f'<helm><status>{helm_status}</status><version>{helm_version}</version></helm>')
+                xml_parts.append('</kubernetes_info>')
             except Exception as e:
                 raise PromptGenerationError(f"Error formatting Kubernetes info: {str(e)}")
 
@@ -111,20 +105,17 @@ def format_system_info(system_info: Optional[Dict] = None) -> str:
         if running_services := system_info.get('running_services_info', []):
             try:
                 if running_services:
-                    xml_parts.append('  <running_services>')
+                    xml_parts.append('<running_services>')
                     for service in running_services:
                         name = service.get('name', 'Unknown')
                         pid = service.get('pid', 'N/A')
-                        xml_parts.append('    <service>')
-                        xml_parts.append(f'      <name>{name}</name>')
-                        xml_parts.append(f'      <pid>{pid}</pid>')
-                        xml_parts.append('    </service>')
-                    xml_parts.append('  </running_services>')
+                        xml_parts.append(f'<service><name>{name}</name><pid>{pid}</pid></service>')
+                    xml_parts.append('</running_services>')
             except Exception as e:
                 raise PromptGenerationError(f"Error formatting running services info: {str(e)}")
 
         xml_parts.append('</system_info>')
-        return '\n'.join(xml_parts)
+        return ''.join(xml_parts)
     except Exception as e:
         raise PromptGenerationError(f"Error processing system information: {str(e)}")
 
