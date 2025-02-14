@@ -259,7 +259,7 @@ class SimpleTerminal:
                     # Remove language identifier if present
                     cmd_lines = part.strip().split('\n')
                     if cmd_lines:
-                        if any(cmd_lines[0].lower() in ['bash', 'shell', 'sh']):
+                        if cmd_lines and cmd_lines[0].lower().strip() in ['bash', 'shell', 'sh']:
                             cmd = '\n'.join(cmd_lines[1:])
                         else:
                             cmd = part.strip()
@@ -302,7 +302,7 @@ class SimpleTerminal:
                     # Remove language identifier if present
                     cmd_lines = part.strip().split('\n')
                     if cmd_lines:
-                        if any(cmd_lines[0].lower() in ['bash', 'shell', 'sh']):
+                        if cmd_lines and cmd_lines[0].lower().strip() in ['bash', 'shell', 'sh']:
                             cmd = '\n'.join(cmd_lines[1:])
                         else:
                             cmd = part.strip()
