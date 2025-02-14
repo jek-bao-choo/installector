@@ -192,12 +192,6 @@ Based on the system information:
                 msg for msg in message_history 
                 if msg["role"] in ["user", "assistant"]
             ]
-
-            # Add initial instruction
-            formatted_messages.append({
-                "role": "user",
-                "content": f"Show me the first step to {operation.lower()} the {vendor} on my system."
-            })
         except Exception as e:
             raise PromptGenerationError(f"Error formatting messages: {str(e)}")
 
