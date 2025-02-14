@@ -309,10 +309,13 @@ class SimpleTerminal:
             
         # If user confirmed execution, run verification
         verifier = VerificationOutput(self.console)
-        if not verifier.run_verification(self.current_verify_command):
-            return False
-                
-        return True
+        success, result = verifier.run_verification(self.current_verify_command)
+        
+        # Store verification result in system_info
+        if result:
+            self.system_info['last_verification_result'] = result
+        
+        return success
 
     def show_streaming_output(self, generator):
         """Show streaming output with live updates and Aider-style code highlighting"""

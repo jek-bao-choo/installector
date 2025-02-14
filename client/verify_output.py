@@ -24,7 +24,7 @@ class VerificationOutput:
     def __init__(self, console: Console):
         self.console = console
 
-    def run_verification(self, verify_command: Optional[str], timeout: int = 30) -> bool:
+    def run_verification(self, verify_command: Optional[str], timeout: int = 30) -> Tuple[bool, Optional[str]]:
         """Run verification command and display results
         
         Args:
@@ -75,17 +75,25 @@ class VerificationOutput:
             status = "✅ Success" if result.returncode == 0 else "❌ Failed"
             self.console.print(Markdown(f"\n**Status**: {status} (return code: {result.returncode})"))
             
-            return result.returncode == 0
+            # Format verification result as string
+            verification_result = ""
+            if result.stdout:
+                verification_result += f"Output:\n{result.stdout}\n"
+            if result.stderr:
+                verification_result += f"Errors:\n{result.stderr}\n"
+            verification_result += f"Status: {'Success' if result.returncode == 0 else 'Failed'} (return code: {result.returncode})"
+            
+            return result.returncode == 0, verification_result
             
         except CommandTimeoutError as e:
             self.console.print(Markdown(f"\n❌ **Timeout Error**: {str(e)}"), style="red")
-            return False
+            return False, f"Timeout Error: {str(e)}"
         except CommandNotFoundError as e:
             self.console.print(Markdown(f"\n❌ **Command Not Found**: {str(e)}"), style="red")
-            return False
+            return False, f"Command Not Found: {str(e)}"
         except CommandExecutionError as e:
             self.console.print(Markdown(f"\n❌ **Execution Error**: {str(e)}"), style="red")
-            return False
+            return False, f"Execution Error: {str(e)}"
         except Exception as e:
             self.console.print(Markdown(f"\n❌ **Unexpected Error**: {str(e)}"), style="red")
-            return False
+            return False, f"Unexpected Error: {str(e)}"
