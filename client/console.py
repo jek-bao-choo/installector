@@ -46,9 +46,9 @@ class SimpleTerminal:
         # Initialize rich console for formatted output
         self.console = Console()
         
-        # Track current commands
-        self.current_exec_command = None
-        self.current_verify_command = None
+        # Track last commands
+        self.last_exec_command = None
+        self.last_verify_command = None
         
         # Initialize vendor manager
         self.vendor_manager = MainMenu(self.console)
@@ -179,10 +179,10 @@ class SimpleTerminal:
                     if 'exec_verify_info' not in self.system_info:
                         self.system_info['exec_verify_info'] = {}
                     # Add current commands to system info under exec_verify_info
-                    if self.current_exec_command:
-                        self.system_info['exec_verify_info']['current_exec_command'] = self.current_exec_command
-                    if self.current_verify_command:
-                        self.system_info['exec_verify_info']['current_verify_command'] = self.current_verify_command
+                    if self.last_exec_command:
+                        self.system_info['exec_verify_info']['last_exec_command'] = self.last_exec_command
+                    if self.last_verify_command:
+                        self.system_info['exec_verify_info']['last_verify_command'] = self.last_verify_command
                     self.console.print(json.dumps(self.system_info, indent=2))
                 else:
                     try:
@@ -246,8 +246,8 @@ class SimpleTerminal:
                         # Format and store the command
                         result.append(self._format_command_block(cmd, 'exec'))
                         # Store the execution command for later use
-                        self.current_exec_command = cmd.strip()
-                        print("***DEBUG Captured exec command:", self.current_exec_command)  # Debug line
+                        self.last_exec_command = cmd.strip()
+                        print("***DEBUG Captured exec command:", self.last_exec_command)  # Debug line
                     
                     # Add any remaining text after </exec>
                     if len(exec_parts) > 1:
@@ -273,8 +273,8 @@ class SimpleTerminal:
                         # Format and store the command
                         result.append(self._format_command_block(cmd, 'verify'))
                         # Store the verification command for later use
-                        self.current_verify_command = cmd.strip()
-                        print("***DEBUG Captured verify command:", self.current_verify_command)  # Debug line
+                        self.last_verify_command = cmd.strip()
+                        print("***DEBUG Captured verify command:", self.last_verify_command)  # Debug line
                     
                     # Add any remaining text after </verify>
                     if len(verify_parts) > 1:
@@ -316,7 +316,7 @@ class SimpleTerminal:
             
         # If user confirmed execution, run verification
         verifier = VerificationOutput(self.console)
-        success, result = verifier.run_verification(self.current_verify_command)
+        success, result = verifier.run_verification(self.last_verify_command)
         
         # Store verification result and status in system_info under exec_verify_info
         if result:
