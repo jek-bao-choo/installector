@@ -231,25 +231,26 @@ class SimpleTerminal:
     def _format_exec_blocks(self, text: str) -> Text:
         """Format execution code blocks and store execution command"""
         result = Text()
+        print("\n***DEBUG _format_exec_blocks input:", text)
         
-        # First try XML tags
-        parts = text.split('<exec>')
-        if len(parts) > 1:  # Found XML tags
+        # Try execution_code tags
+        parts = text.split('<execution_code>')
+        if len(parts) > 1:  # Found execution_code tags
             for i, part in enumerate(parts):
                 if i == 0:
                     result.append(part)
                 else:
-                    exec_parts = part.split('</exec>', 1)
+                    exec_parts = part.split('</execution_code>', 1)
                     if len(exec_parts) >= 1:
-                        cmd_block = exec_parts[0].strip()
-                        if cmd := self._extract_command_from_tags(cmd_block):
+                        cmd = exec_parts[0].strip()
+                        if cmd:
                             result.append(self._format_command_block(cmd, 'exec'))
-                            self.last_exec_command = cmd.strip()
-                            print("***DEBUG Captured exec command from XML:", self.last_exec_command)
+                            self.last_exec_command = cmd
+                            print("***DEBUG Captured exec command:", self.last_exec_command)
                         
                         if len(exec_parts) > 1:
                             result.append(exec_parts[1])
-        else:  # Try backticks
+        else:  # Try backticks as fallback
             parts = text.split('```')
             for i, part in enumerate(parts):
                 if i == 0:
