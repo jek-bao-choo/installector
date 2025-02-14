@@ -351,7 +351,15 @@ class SimpleTerminal:
             
             if success:
                 # Request next step if verification was successful
-                self.message_broker.add_message("The previous step was successful. Please provide the next step.")
+                next_step_msg = f"""The previous step was successful. Here are the details:
+
+                               Executed Command: {self.last_exec_command}
+                               Verification Command: {self.last_verify_command}
+                               Verification Result: {result}
+
+                               Please provide the next step. However, if there are no more steps remaining, include <TERMINATE></TERMINATE> in your response.."""
+
+                self.message_broker.add_message(next_step_msg)
             else:
                 # Request troubleshooting help if verification failed
                 troubleshoot_msg = f"""The previous step failed. Here are the details:

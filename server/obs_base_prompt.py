@@ -22,7 +22,7 @@ System Environment:
 IMPORTANT RESPONSE FORMAT:
 Return ONLY ONE step at a time. Each step MUST follow this EXACT format with ALL sections:
 
-Step X: [Brief Title]
+[Brief Title]
 [Detailed explanation of what this step does and why it's needed]
 
 
