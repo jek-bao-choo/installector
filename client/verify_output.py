@@ -24,6 +24,39 @@ class VerificationOutput:
     def __init__(self, console: Console):
         self.console = console
 
+    def handle_verification_status(self, success: bool, result: str, message_broker, last_exec_command: str, last_verify_command: str) -> None:
+        """Handle the next steps based on verification status"""
+        try:
+            if success:
+                # Request next step if verification was successful
+                next_step_msg = f"""The previous step was successful. Here are the details:
+
+                               Executed Command: {last_exec_command}
+                               Verification Command: {last_verify_command}
+                               Verification Result: {result}
+
+                               Please provide the next step. However, if there are no more steps remaining, include <TERMINATE></TERMINATE> in your response."""
+
+                message_broker.add_message(next_step_msg)
+            else:
+                # Request troubleshooting help if verification failed
+                troubleshoot_msg = f"""The previous step failed. Here are the details:
+                
+                Executed Command: {last_exec_command}
+                Verification Command: {last_verify_command}
+                Verification Result: {result}
+                
+                Please analyze the output and provide specific troubleshooting steps to resolve this issue."""
+                
+                message_broker.add_message(troubleshoot_msg)
+            
+            # Show the LLM's response
+            return message_broker.get_response()
+            
+        except Exception as e:
+            self.console.print(Markdown(f"\n❌ **Error handling verification status**: {str(e)}"), style="red")
+            raise VerificationError(f"Error handling verification status: {str(e)}")
+
     def run_verification(self, verify_command: Optional[str], timeout: int = 30) -> bool | tuple[bool, str]:
         """Run verification command and display results
         

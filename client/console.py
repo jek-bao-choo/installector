@@ -339,44 +339,6 @@ class SimpleTerminal:
             # Return original text wrapped in Text object if formatting fails
             return Text(text)
 
-    def _handle_verification_status(self, success: bool, result: str) -> None:
-        """Handle the next steps based on verification status"""
-        try:
-            if 'exec_verify_info' not in self.system_info:
-                self.system_info['exec_verify_info'] = {}
-            
-            # Store verification info
-            self.system_info['exec_verify_info']['last_verification_result'] = result
-            self.system_info['exec_verify_info']['last_verification_status'] = success
-            
-            if success:
-                # Request next step if verification was successful
-                next_step_msg = f"""The previous step was successful. Here are the details:
-
-                               Executed Command: {self.last_exec_command}
-                               Verification Command: {self.last_verify_command}
-                               Verification Result: {result}
-
-                               Please provide the next step. However, if there are no more steps remaining, include <TERMINATE></TERMINATE> in your response.."""
-
-                self.message_broker.add_message(next_step_msg)
-            else:
-                # Request troubleshooting help if verification failed
-                troubleshoot_msg = f"""The previous step failed. Here are the details:
-                
-                Executed Command: {self.last_exec_command}
-                Verification Command: {self.last_verify_command}
-                Verification Result: {result}
-                
-                Please analyze the output and provide specific troubleshooting steps to resolve this issue."""
-                
-                self.message_broker.add_message(troubleshoot_msg)
-            
-            # Show the LLM's response
-            self.show_streaming_output(self.message_broker.get_response())
-            
-        except Exception as e:
-            self.show_error(f"Error handling verification status: {str(e)}")
 
     def _get_command_confirmation(self) -> bool:
         """Ask user to confirm if they executed the command
@@ -407,8 +369,25 @@ class SimpleTerminal:
         verifier = VerificationOutput(self.console)
         success, result = verifier.run_verification(self.last_verify_command)
         
+        # Store verification info
+        if 'exec_verify_info' not in self.system_info:
+            self.system_info['exec_verify_info'] = {}
+        self.system_info['exec_verify_info']['last_verification_result'] = result
+        self.system_info['exec_verify_info']['last_verification_status'] = success
+
         # Handle the verification status
-        self._handle_verification_status(success, result)
+        try:
+            verifier = VerificationOutput(self.console)
+            response_generator = verifier.handle_verification_status(
+                success, 
+                result,
+                self.message_broker,
+                self.last_exec_command,
+                self.last_verify_command
+            )
+            self.show_streaming_output(response_generator)
+        except Exception as e:
+            self.show_error(f"Error handling verification status: {str(e)}")
         
         return success
 
