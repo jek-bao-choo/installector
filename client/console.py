@@ -274,25 +274,26 @@ class SimpleTerminal:
     def _format_verify_blocks(self, text: str) -> Text:
         """Format verification code blocks and store verification command"""
         result = Text()
+        print("\n***DEBUG _format_verify_blocks input:", text)
         
-        # First try XML tags
-        parts = text.split('<verify>')
-        if len(parts) > 1:  # Found XML tags
+        # Try verification_code tags
+        parts = text.split('<verification_code>')
+        if len(parts) > 1:  # Found verification_code tags
             for i, part in enumerate(parts):
                 if i == 0:
                     result.append(part)
                 else:
-                    verify_parts = part.split('</verify>', 1)
+                    verify_parts = part.split('</verification_code>', 1)
                     if len(verify_parts) >= 1:
-                        cmd_block = verify_parts[0].strip()
-                        if cmd := self._extract_command_from_tags(cmd_block):
+                        cmd = verify_parts[0].strip()
+                        if cmd:
                             result.append(self._format_command_block(cmd, 'verify'))
-                            self.last_verify_command = cmd.strip()
-                            # print("***DEBUG Captured verify command from XML:", self.last_verify_command)
+                            self.last_verify_command = cmd
+                            print("***DEBUG Captured verify command:", self.last_verify_command)
                         
                         if len(verify_parts) > 1:
                             result.append(verify_parts[1])
-        else:  # Try backticks
+        else:  # Try backticks as fallback
             parts = text.split('```')
             for i, part in enumerate(parts):
                 if i == 0:
@@ -307,7 +308,7 @@ class SimpleTerminal:
                             cmd = part.strip()
                         result.append(self._format_command_block(cmd, 'verify'))
                         self.last_verify_command = cmd.strip()
-                        # print("***DEBUG Captured verify command from backticks:", self.last_verify_command)
+                        print("***DEBUG Captured verify command from backticks:", self.last_verify_command)
                 else:  # Outside backticks
                     result.append(part)
         
