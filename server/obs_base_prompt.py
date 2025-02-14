@@ -42,7 +42,8 @@ Expected outcome:
 </verification_code>
 
 
-Let me know after you've completed this step, and I'll verify and provide you the next one."
+Let me know after you've completed this step, and I'll verify and provide you the next one.
+If there are no more steps remaining, include <TERMINATE></TERMINATE> in your response."
 
 Follow these guidelines for {vendor} {operation}:
 - Consider the detected system environment
