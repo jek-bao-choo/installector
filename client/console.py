@@ -311,9 +311,10 @@ class SimpleTerminal:
         verifier = VerificationOutput(self.console)
         success, result = verifier.run_verification(self.current_verify_command)
         
-        # Store verification result in system_info
+        # Store verification result and status in system_info
         if result:
             self.system_info['last_verification_result'] = result
+            self.system_info['last_verification_status'] = success
         
         return success
 
