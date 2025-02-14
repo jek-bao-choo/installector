@@ -42,9 +42,7 @@ Expected outcome:
 </verification_code>
 
 
-Note: Wait for confirmation after executing the command before proceeding to the next step.
-
-Let me know after you've completed this step, and I'll provide the next one."
+Let me know after you've completed this step, and I'll verify and provide you the next one."
 
 Follow these guidelines for {vendor} {operation}:
 - Consider the detected system environment
