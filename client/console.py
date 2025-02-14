@@ -231,54 +231,84 @@ class SimpleTerminal:
     def _format_exec_blocks(self, text: str) -> Text:
         """Format execution code blocks and store execution command"""
         result = Text()
-        parts = text.split('<exec>')
         
-        for i, part in enumerate(parts):
-            if i == 0:
-                # Add any text before the first <exec> tag
-                result.append(part)
-            else:
-                # Handle text between <exec> and </exec>
-                exec_parts = part.split('</exec>', 1)  # Split only on first occurrence
-                if len(exec_parts) >= 1:
-                    cmd_block = exec_parts[0].strip()
-                    if cmd := self._extract_command_from_tags(cmd_block):
-                        # Format and store the command
+        # First try XML tags
+        parts = text.split('<exec>')
+        if len(parts) > 1:  # Found XML tags
+            for i, part in enumerate(parts):
+                if i == 0:
+                    result.append(part)
+                else:
+                    exec_parts = part.split('</exec>', 1)
+                    if len(exec_parts) >= 1:
+                        cmd_block = exec_parts[0].strip()
+                        if cmd := self._extract_command_from_tags(cmd_block):
+                            result.append(self._format_command_block(cmd, 'exec'))
+                            self.last_exec_command = cmd.strip()
+                            print("***DEBUG Captured exec command from XML:", self.last_exec_command)
+                        
+                        if len(exec_parts) > 1:
+                            result.append(exec_parts[1])
+        else:  # Try backticks
+            parts = text.split('```')
+            for i, part in enumerate(parts):
+                if i == 0:
+                    result.append(part)
+                elif i % 2 == 1:  # Inside backticks
+                    # Remove language identifier if present
+                    cmd_lines = part.strip().split('\n')
+                    if cmd_lines:
+                        if any(cmd_lines[0].lower() in ['bash', 'shell', 'sh']):
+                            cmd = '\n'.join(cmd_lines[1:])
+                        else:
+                            cmd = part.strip()
                         result.append(self._format_command_block(cmd, 'exec'))
-                        # Store the execution command for later use
                         self.last_exec_command = cmd.strip()
-                        print("***DEBUG Captured exec command:", self.last_exec_command)  # Debug line
-                    
-                    # Add any remaining text after </exec>
-                    if len(exec_parts) > 1:
-                        result.append(exec_parts[1])
+                        print("***DEBUG Captured exec command from backticks:", self.last_exec_command)
+                else:  # Outside backticks
+                    result.append(part)
         
         return result
 
     def _format_verify_blocks(self, text: str) -> Text:
         """Format verification code blocks and store verification command"""
         result = Text()
-        parts = text.split('<verify>')
         
-        for i, part in enumerate(parts):
-            if i == 0:
-                # Add any text before the first <verify> tag
-                result.append(part)
-            else:
-                # Handle text between <verify> and </verify>
-                verify_parts = part.split('</verify>', 1)  # Split only on first occurrence
-                if len(verify_parts) >= 1:
-                    cmd_block = verify_parts[0].strip()
-                    if cmd := self._extract_command_from_tags(cmd_block):
-                        # Format and store the command
+        # First try XML tags
+        parts = text.split('<verify>')
+        if len(parts) > 1:  # Found XML tags
+            for i, part in enumerate(parts):
+                if i == 0:
+                    result.append(part)
+                else:
+                    verify_parts = part.split('</verify>', 1)
+                    if len(verify_parts) >= 1:
+                        cmd_block = verify_parts[0].strip()
+                        if cmd := self._extract_command_from_tags(cmd_block):
+                            result.append(self._format_command_block(cmd, 'verify'))
+                            self.last_verify_command = cmd.strip()
+                            print("***DEBUG Captured verify command from XML:", self.last_verify_command)
+                        
+                        if len(verify_parts) > 1:
+                            result.append(verify_parts[1])
+        else:  # Try backticks
+            parts = text.split('```')
+            for i, part in enumerate(parts):
+                if i == 0:
+                    result.append(part)
+                elif i % 2 == 1:  # Inside backticks
+                    # Remove language identifier if present
+                    cmd_lines = part.strip().split('\n')
+                    if cmd_lines:
+                        if any(cmd_lines[0].lower() in ['bash', 'shell', 'sh']):
+                            cmd = '\n'.join(cmd_lines[1:])
+                        else:
+                            cmd = part.strip()
                         result.append(self._format_command_block(cmd, 'verify'))
-                        # Store the verification command for later use
                         self.last_verify_command = cmd.strip()
-                        print("***DEBUG Captured verify command:", self.last_verify_command)  # Debug line
-                    
-                    # Add any remaining text after </verify>
-                    if len(verify_parts) > 1:
-                        result.append(verify_parts[1])
+                        print("***DEBUG Captured verify command from backticks:", self.last_verify_command)
+                else:  # Outside backticks
+                    result.append(part)
         
         return result
 
