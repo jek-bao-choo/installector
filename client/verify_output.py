@@ -24,7 +24,7 @@ class VerificationOutput:
     def __init__(self, console: Console):
         self.console = console
 
-    def run_verification(self, verify_command: Optional[str], timeout: int = 30) -> Tuple[bool, Optional[str]]:
+    def run_verification(self, verify_command: Optional[str], timeout: int = 30) -> bool | tuple[bool, str]:
         """Run verification command and display results
         
         Args:
