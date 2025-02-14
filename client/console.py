@@ -378,14 +378,14 @@ class SimpleTerminal:
         # Handle the verification status
         try:
             verifier = VerificationOutput(self.console)
-            response_generator = verifier.handle_verification_status(
+            verifier.handle_verification_status(
                 success, 
                 result,
                 self.message_broker,
                 self.last_exec_command,
                 self.last_verify_command
             )
-            self.show_streaming_output(response_generator)
+            self.show_streaming_output(self.message_broker.get_response())
         except Exception as e:
             self.show_error(f"Error handling verification status: {str(e)}")
         
