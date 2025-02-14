@@ -116,10 +116,14 @@ class SimpleTerminal:
         if obs_operation == "menu":
             return mode_type, "menu"
         
-        # Add both vendor and operation to system info
-        self.system_info['mode_type'] = mode_type
-        self.system_info['selected_vendor'] = selection
-        self.system_info['selected_operation'] = obs_operation
+        # Initialize user_select_info if it doesn't exist
+        if 'user_select_info' not in self.system_info:
+            self.system_info['user_select_info'] = {}
+            
+        # Add both vendor and operation to system info under user_select_info
+        self.system_info['user_select_info']['mode_type'] = mode_type
+        self.system_info['user_select_info']['selected_vendor'] = selection
+        self.system_info['user_select_info']['selected_operation'] = obs_operation
         
         # Construct a meaningful message based on selections
         try:
@@ -361,9 +365,13 @@ def main():
             else:
                 mode_type = 'infrastructure'
                 obs_operation = None
-                # Add infrastructure selection to system info
-                io.system_info['mode_type'] = mode_type
-                io.system_info['selected_platform'] = selection
+                # Initialize user_select_info if it doesn't exist
+                if 'user_select_info' not in io.system_info:
+                    io.system_info['user_select_info'] = {}
+                    
+                # Add infrastructure selection to system info under user_select_info
+                io.system_info['user_select_info']['mode_type'] = mode_type
+                io.system_info['user_select_info']['selected_platform'] = selection
 
             # Handle command loop
             should_continue = io.handle_command_loop(mode_type, selection, obs_operation)

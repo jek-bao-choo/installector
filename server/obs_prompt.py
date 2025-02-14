@@ -36,8 +36,9 @@ def _validate_message_history(message_history: List[Dict[str, str]]) -> None:
 
 def _validate_vendor_operation(system_info: Dict) -> Tuple[str, str]:
     """Validate and extract vendor and operation information"""
-    vendor = system_info.get('selected_vendor', '')
-    operation = system_info.get('selected_operation', '')
+    user_select = system_info.get('user_select_info', {})
+    vendor = user_select.get('selected_vendor', '')
+    operation = user_select.get('selected_operation', '')
     
     if not vendor:
         raise VendorOperationError("No vendor selected")
