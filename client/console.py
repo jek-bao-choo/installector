@@ -175,11 +175,14 @@ class SimpleTerminal:
                     self.console.clear()
                 elif cmd == 'system':
                     self.show_markdown("# System Information")
-                    # Add current commands to system info
+                    # Initialize exec_verify_info if it doesn't exist
+                    if 'exec_verify_info' not in self.system_info:
+                        self.system_info['exec_verify_info'] = {}
+                    # Add current commands to system info under exec_verify_info
                     if self.current_exec_command:
-                        self.system_info['current_exec_command'] = self.current_exec_command
+                        self.system_info['exec_verify_info']['current_exec_command'] = self.current_exec_command
                     if self.current_verify_command:
-                        self.system_info['current_verify_command'] = self.current_verify_command
+                        self.system_info['exec_verify_info']['current_verify_command'] = self.current_verify_command
                     self.console.print(json.dumps(self.system_info, indent=2))
                 else:
                     try:
@@ -315,10 +318,12 @@ class SimpleTerminal:
         verifier = VerificationOutput(self.console)
         success, result = verifier.run_verification(self.current_verify_command)
         
-        # Store verification result and status in system_info
+        # Store verification result and status in system_info under exec_verify_info
         if result:
-            self.system_info['last_verification_result'] = result
-            self.system_info['last_verification_status'] = success
+            if 'exec_verify_info' not in self.system_info:
+                self.system_info['exec_verify_info'] = {}
+            self.system_info['exec_verify_info']['last_verification_result'] = result
+            self.system_info['exec_verify_info']['last_verification_status'] = success
         
         return success
 
