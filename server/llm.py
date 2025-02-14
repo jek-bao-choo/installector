@@ -7,7 +7,7 @@ def get_llm_response(messages: List[Dict[str, str]]) -> Generator[str, None, Non
     """Stream responses from the LLM"""
     try:
         response = completion(
-            model="openrouter/deepseek/deepseek-r1-distill-qwen-32b",
+            model="openrouter/google/gemini-2.0-pro-exp-02-05:free",
             messages=messages,
             stream=True,
         )

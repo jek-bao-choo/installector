@@ -186,7 +186,7 @@ class SimpleTerminal:
                     self.console.print(json.dumps(self.system_info, indent=2))
                 else:
                     try:
-                        print("***DEBUG add_message(cmd)", cmd)
+                        # print("***DEBUG add_message(cmd)", cmd)
                         self.message_broker.add_message(cmd)
                         self.show_streaming_output(self.message_broker.get_response())
                     except MessageBrokerError as e:
@@ -287,7 +287,7 @@ class SimpleTerminal:
                         if cmd := self._extract_command_from_tags(cmd_block):
                             result.append(self._format_command_block(cmd, 'verify'))
                             self.last_verify_command = cmd.strip()
-                            print("***DEBUG Captured verify command from XML:", self.last_verify_command)
+                            # print("***DEBUG Captured verify command from XML:", self.last_verify_command)
                         
                         if len(verify_parts) > 1:
                             result.append(verify_parts[1])
@@ -306,7 +306,7 @@ class SimpleTerminal:
                             cmd = part.strip()
                         result.append(self._format_command_block(cmd, 'verify'))
                         self.last_verify_command = cmd.strip()
-                        print("***DEBUG Captured verify command from backticks:", self.last_verify_command)
+                        # print("***DEBUG Captured verify command from backticks:", self.last_verify_command)
                 else:  # Outside backticks
                     result.append(part)
         
@@ -316,19 +316,19 @@ class SimpleTerminal:
         """Format text to highlight code blocks with XML-style tags"""
         try:
             # First format exec blocks
-            print("\n***DEBUG _format_code_block input:", text)
+            # print("\n***DEBUG _format_code_block input:", text)
             result = self._format_exec_blocks(text)
             if not isinstance(result, Text):
-                print("***DEBUG _format_exec_blocks returned non-Text:", type(result))
+                # print("***DEBUG _format_exec_blocks returned non-Text:", type(result))
                 result = Text(str(result))
             
             # Then format verify blocks using the formatted exec blocks
             result_str = str(result)
-            print("\n***DEBUG _format_code_block after exec blocks:", result_str)
+            # print("\n***DEBUG _format_code_block after exec blocks:", result_str)
             
             verify_result = self._format_verify_blocks(result_str)
             if not isinstance(verify_result, Text):
-                print("***DEBUG _format_verify_blocks returned non-Text:", type(verify_result))
+                # print("***DEBUG _format_verify_blocks returned non-Text:", type(verify_result))
                 verify_result = Text(str(verify_result))
                 
             return verify_result
@@ -386,14 +386,14 @@ class SimpleTerminal:
             with Live(refresh_per_second=4) as live:
                 for content in generator:
                     if not isinstance(content, str):
-                        print(f"***DEBUG Unexpected content type: {type(content)}")
+                        # print(f"***DEBUG Unexpected content type: {type(content)}")
                         content = str(content)
                     
                     accumulated_text += content
                     try:
                         formatted_text = self._format_code_block(accumulated_text)
                         if not isinstance(formatted_text, Text):
-                            print(f"***DEBUG Unexpected formatted_text type: {type(formatted_text)}")
+                            # print(f"***DEBUG Unexpected formatted_text type: {type(formatted_text)}")
                             formatted_text = Text(str(formatted_text))
                         live.update(formatted_text)
                     except Exception as format_error:

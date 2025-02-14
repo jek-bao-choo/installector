@@ -144,26 +144,26 @@ Return ONLY ONE step at a time. Each step MUST follow this EXACT format with ALL
 Step X: [Brief Title]
 [Detailed explanation of what this step does and why it's needed]
 
-Execute this command (REQUIRED - must include <exec> tags):
-<exec>
-<code>
+Execution:
+```
 [actual command to run]
-</code>
-</exec>
+```
 
-Expected outcome:
+
+Expectation:
 - [What user should see if successful]
 - [What files/changes to expect]
 - [Any potential warnings or errors]
 
-To verify the step completed successfully (REQUIRED - must include <verify> tags):
-<verify>
-<code>
-[verification command to check success]
-</code>
-</verify>
 
-IMPORTANT: Both <exec> and <verify> sections with their tags are REQUIRED for EVERY step.
+Verification:
+```
+[verification command to check success]
+```
+
+
+
+IMPORTANT: Wrap the execution command, together with the backticks, in "execute" XML tags. Wrap the verification command, together with the backticks, in "verify" XML tags. These tags are REQUIRED for EVERY step.
 
 Note: Wait for confirmation after executing the command before proceeding to the next step.
 
