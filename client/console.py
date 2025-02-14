@@ -339,6 +339,37 @@ class SimpleTerminal:
             # Return original text wrapped in Text object if formatting fails
             return Text(text)
 
+    def _handle_verification_status(self, success: bool, result: str) -> None:
+        """Handle the next steps based on verification status"""
+        try:
+            if 'exec_verify_info' not in self.system_info:
+                self.system_info['exec_verify_info'] = {}
+            
+            # Store verification info
+            self.system_info['exec_verify_info']['last_verification_result'] = result
+            self.system_info['exec_verify_info']['last_verification_status'] = success
+            
+            if success:
+                # Request next step if verification was successful
+                self.message_broker.add_message("The previous step was successful. Please provide the next step.")
+            else:
+                # Request troubleshooting help if verification failed
+                troubleshoot_msg = f"""The previous step failed. Here are the details:
+                
+                Executed Command: {self.last_exec_command}
+                Verification Command: {self.last_verify_command}
+                Verification Result: {result}
+                
+                Please analyze the output and provide specific troubleshooting steps to resolve this issue."""
+                
+                self.message_broker.add_message(troubleshoot_msg)
+            
+            # Show the LLM's response
+            self.show_streaming_output(self.message_broker.get_response())
+            
+        except Exception as e:
+            self.show_error(f"Error handling verification status: {str(e)}")
+
     def _get_command_confirmation(self) -> bool:
         """Ask user to confirm if they executed the command
         Returns True if user confirmed execution, False otherwise"""
@@ -368,12 +399,8 @@ class SimpleTerminal:
         verifier = VerificationOutput(self.console)
         success, result = verifier.run_verification(self.last_verify_command)
         
-        # Store verification result and status in system_info under exec_verify_info
-        if result:
-            if 'exec_verify_info' not in self.system_info:
-                self.system_info['exec_verify_info'] = {}
-            self.system_info['exec_verify_info']['last_verification_result'] = result
-            self.system_info['exec_verify_info']['last_verification_status'] = success
+        # Handle the verification status
+        self._handle_verification_status(success, result)
         
         return success
 
