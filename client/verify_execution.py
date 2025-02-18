@@ -29,24 +29,12 @@ class VerificationOutput:
         try:
             if success:
                 # Request next step if verification was successful
-                next_step_msg = f"""The previous step was successful. Here are the details:
-
-                               Executed Command: {last_exec_command}
-                               Verification Command: {last_verify_command}
-                               Verification Result: {result}
-
-                               Please provide the next step. However, if there are no more steps remaining, include <TERMINATE></TERMINATE> in your response."""
+                next_step_msg = f"""The previous step was successful. Here are the details: <executed_command>{last_exec_command}</executed_command><verification_command>{last_verify_command}</verification_command><verification_result>{result}</verification_result> Please provide the next step. However, if there are no more steps remaining, include <TERMINATE></TERMINATE> in your response."""
 
                 message_broker.add_message(next_step_msg)
             else:
                 # Request troubleshooting help if verification failed
-                troubleshoot_msg = f"""The previous step failed. Here are the details:
-                
-                Executed Command: {last_exec_command}
-                Verification Command: {last_verify_command}
-                Verification Result: {result}
-                
-                Please analyze the output and provide specific troubleshooting steps to resolve this issue."""
+                troubleshoot_msg = f"""The previous step failed. Here are the details: <executed_command>{last_exec_command}</executed_command><verification_command>{last_verify_command}</verification_command><verification_result>{result}</verification_result> Please analyze the output and provide specific troubleshooting steps to resolve this issue."""
                 
                 message_broker.add_message(troubleshoot_msg)
             
