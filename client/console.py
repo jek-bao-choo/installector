@@ -393,6 +393,11 @@ class SimpleTerminal:
         """Extract content between XML tags, handling both normal and code block formats"""
         import re
         
+        # Handle terminate tags case-insensitively
+        if tag.lower() == "terminate":
+            pattern = r"<terminate>.*?</terminate>"
+            return "true" if re.search(pattern, text, re.DOTALL | re.IGNORECASE) else ""
+        
         # Try standard XML tags first
         pattern = f"<{tag}>(.*?)</{tag}>"
         match = re.search(pattern, text, re.DOTALL)
