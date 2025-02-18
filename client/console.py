@@ -437,8 +437,8 @@ class SimpleTerminal:
                             return
                             
                         # Store response sections in system_info
-                        if 'latest_llm_response' not in self.system_info:
-                            self.system_info['latest_llm_response'] = {}
+                        if 'last_llm_response' not in self.system_info:
+                            self.system_info['last_llm_response'] = {}
                             
                         # Extract and store each section
                         sections = {
@@ -451,7 +451,7 @@ class SimpleTerminal:
                             'conclusion': self._extract_xml_section(accumulated_text, 'conclusion_section')
                         }
                         
-                        self.system_info['latest_llm_response'] = sections
+                        self.system_info['last_llm_response'] = sections
                         
                         # Update execution and verification commands if present
                         if sections['execution']:
