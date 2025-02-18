@@ -202,11 +202,6 @@ class SimpleTerminal:
         md = Markdown(markdown_text)
         self.console.print(md)
 
-    def _extract_command_from_tags(self, cmd_block: str) -> Optional[str]:
-        """Extract command from between <code> tags"""
-        if '<code>' in cmd_block and '</code>' in cmd_block:
-            return cmd_block.split('<code>')[1].split('</code>')[0].strip()
-        return None
 
     def _format_command_block(self, cmd: str, block_type: str) -> Text:
         """Format a command block with proper styling
@@ -226,116 +221,7 @@ class SimpleTerminal:
         result.append('─' * 80 + '\n', style="dim")
         return result
 
-    def _format_exec_blocks(self, text: str) -> Text:
-        """Format execution code blocks and store execution command"""
-        result = Text()
-        print("\n***DEBUG _format_exec_blocks input:", text)
-        
-        # Try execution_section tags
-        parts = text.split('<execution_section>')
-        if len(parts) > 1:  # Found execution_section tags
-            for i, part in enumerate(parts):
-                if i == 0:
-                    result.append(part)
-                else:
-                    exec_parts = part.split('</execution_section>', 1)
-                    if len(exec_parts) >= 1:
-                        cmd = exec_parts[0].strip()
-                        if cmd:
-                            result.append(self._format_command_block(cmd, 'exec'))
-                            self.last_exec_command = cmd
-                            print("***DEBUG Captured exec command:", self.last_exec_command)
-                        
-                        if len(exec_parts) > 1:
-                            result.append(exec_parts[1])
-        else:  # Try backticks as fallback
-            parts = text.split('```')
-            for i, part in enumerate(parts):
-                if i == 0:
-                    result.append(part)
-                elif i % 2 == 1:  # Inside backticks
-                    # Remove language identifier if present
-                    cmd_lines = part.strip().split('\n')
-                    if cmd_lines:
-                        if cmd_lines and cmd_lines[0].lower().strip() in ['bash', 'shell', 'sh']:
-                            cmd = '\n'.join(cmd_lines[1:])
-                        else:
-                            cmd = part.strip()
-                        result.append(self._format_command_block(cmd, 'exec'))
-                        self.last_exec_command = cmd.strip()
-                        print("***DEBUG Captured exec command from backticks:", self.last_exec_command)
-                else:  # Outside backticks
-                    result.append(part)
-        
-        return result
 
-    def _format_verify_blocks(self, text: str) -> Text:
-        """Format verification code blocks and store verification command"""
-        result = Text()
-        print("\n***DEBUG _format_verify_blocks input:", text)
-        
-        # Try verification_section tags
-        parts = text.split('<verification_section>')
-        if len(parts) > 1:  # Found verification_section tags
-            for i, part in enumerate(parts):
-                if i == 0:
-                    result.append(part)
-                else:
-                    verify_parts = part.split('</verification_section>', 1)
-                    if len(verify_parts) >= 1:
-                        cmd = verify_parts[0].strip()
-                        if cmd:
-                            result.append(self._format_command_block(cmd, 'verify'))
-                            self.last_verify_command = cmd
-                            print("***DEBUG Captured verify command:", self.last_verify_command)
-                        
-                        if len(verify_parts) > 1:
-                            result.append(verify_parts[1])
-        else:  # Try backticks as fallback
-            parts = text.split('```')
-            for i, part in enumerate(parts):
-                if i == 0:
-                    result.append(part)
-                elif i % 2 == 1:  # Inside backticks
-                    # Remove language identifier if present
-                    cmd_lines = part.strip().split('\n')
-                    if cmd_lines:
-                        if cmd_lines and cmd_lines[0].lower().strip() in ['bash', 'shell', 'sh']:
-                            cmd = '\n'.join(cmd_lines[1:])
-                        else:
-                            cmd = part.strip()
-                        result.append(self._format_command_block(cmd, 'verify'))
-                        self.last_verify_command = cmd.strip()
-                        print("***DEBUG Captured verify command from backticks:", self.last_verify_command)
-                else:  # Outside backticks
-                    result.append(part)
-        
-        return result
-
-    def _format_code_block(self, text: str) -> Text:
-        """Format text to highlight code blocks with XML-style tags"""
-        try:
-            # First format exec blocks
-            # print("\n***DEBUG _format_code_block input:", text)
-            result = self._format_exec_blocks(text)
-            if not isinstance(result, Text):
-                # print("***DEBUG _format_exec_blocks returned non-Text:", type(result))
-                result = Text(str(result))
-            
-            # Then format verify blocks using the formatted exec blocks
-            result_str = str(result)
-            # print("\n***DEBUG _format_code_block after exec blocks:", result_str)
-            
-            verify_result = self._format_verify_blocks(result_str)
-            if not isinstance(verify_result, Text):
-                # print("***DEBUG _format_verify_blocks returned non-Text:", type(verify_result))
-                verify_result = Text(str(verify_result))
-                
-            return verify_result
-        except Exception as e:
-            print(f"***DEBUG _format_code_block error: {str(e)}")
-            # Return original text wrapped in Text object if formatting fails
-            return Text(text)
 
 
     def _get_command_confirmation(self) -> bool:
