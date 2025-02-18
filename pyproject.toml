@@ -1,14 +1,22 @@
 [project]
 name = "installector"
 version = "0.1.0"
-description = "Add your description here"
+description = "AI assistant for installing agent collectors in your terminal"
 readme = "README.md"
 requires-python = ">=3.13"
+license = { text = "GPL-3.0" }
 dependencies = [
     "litellm==1.60.5",
     "prompt-toolkit>=3.0.50",
-    "pygments>=2.19.1",
+    "pygments>=2.19.1", 
     "rich>=13.9.4",
     "psutil>=5.9.0",
     "distro>=1.8.0",
 ]
+
+[project.scripts]
+installector = "client.console:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
