@@ -389,8 +389,28 @@ class SimpleTerminal:
         
         return success
 
+    def _extract_xml_section(self, text: str, tag: str) -> str:
+        """Extract content between XML tags, handling both normal and code block formats"""
+        import re
+        
+        # Try standard XML tags first
+        pattern = f"<{tag}>(.*?)</{tag}>"
+        match = re.search(pattern, text, re.DOTALL)
+        
+        if match:
+            content = match.group(1).strip()
+            
+            # If content contains backtick code blocks, extract from them
+            code_pattern = r"```(?:xml|bash|shell|\w+)?\n?(.*?)```"
+            code_match = re.search(code_pattern, content, re.DOTALL)
+            if code_match:
+                return code_match.group(1).strip()
+            
+            return content
+        return ""
+
     def show_streaming_output(self, generator):
-        """Show streaming output with live updates and Aider-style code highlighting"""
+        """Show streaming output with live updates and XML section parsing"""
         try:
             if not generator:
                 self.show_error("No content received from generator")
@@ -400,22 +420,70 @@ class SimpleTerminal:
             with Live(refresh_per_second=4) as live:
                 for content in generator:
                     if not isinstance(content, str):
-                        # print(f"***DEBUG Unexpected content type: {type(content)}")
                         content = str(content)
                     
                     accumulated_text += content
+                    
                     try:
-                        formatted_text = self._format_code_block(accumulated_text)
-                        if not isinstance(formatted_text, Text):
-                            # print(f"***DEBUG Unexpected formatted_text type: {type(formatted_text)}")
-                            formatted_text = Text(str(formatted_text))
+                        # Check for termination signal
+                        if "<TERMINATE></TERMINATE>" in accumulated_text:
+                            self.console.print(Markdown("\n## 🎉 Operation Complete!"))
+                            self.console.print(Markdown("All steps have been successfully completed. Returning to menu..."))
+                            return
+                            
+                        # Store response sections in system_info
+                        if 'latest_llm_response' not in self.system_info:
+                            self.system_info['latest_llm_response'] = {}
+                            
+                        # Extract and store each section
+                        sections = {
+                            'think': self._extract_xml_section(accumulated_text, 'think'),
+                            'title': self._extract_xml_section(accumulated_text, 'title_section'),
+                            'description': self._extract_xml_section(accumulated_text, 'description_section'),
+                            'execution': self._extract_xml_section(accumulated_text, 'execution_section'),
+                            'expected': self._extract_xml_section(accumulated_text, 'expected_section'),
+                            'verification': self._extract_xml_section(accumulated_text, 'verification_section'),
+                            'conclusion': self._extract_xml_section(accumulated_text, 'conclusion_section')
+                        }
+                        
+                        self.system_info['latest_llm_response'] = sections
+                        
+                        # Update execution and verification commands if present
+                        if sections['execution']:
+                            self.last_exec_command = sections['execution']
+                        if sections['verification']:
+                            self.last_verify_command = sections['verification']
+                        
+                        # Format the display text
+                        formatted_text = Text()
+                        
+                        # Add each section with appropriate formatting
+                        if sections['title']:
+                            formatted_text.append(f"\n## {sections['title']}\n\n", style="bold cyan")
+                        
+                        if sections['description']:
+                            formatted_text.append(f"{sections['description']}\n\n")
+                            
+                        if sections['execution']:
+                            formatted_text.append(self._format_command_block(sections['execution'], 'exec'))
+                            
+                        if sections['expected']:
+                            formatted_text.append("\nExpected Outcome:\n", style="bold yellow")
+                            formatted_text.append(f"{sections['expected']}\n")
+                            
+                        if sections['verification']:
+                            formatted_text.append(self._format_command_block(sections['verification'], 'verify'))
+                            
+                        if sections['conclusion']:
+                            formatted_text.append(f"\n{sections['conclusion']}\n", style="italic")
+                            
                         live.update(formatted_text)
+                        
                     except Exception as format_error:
                         print(f"***DEBUG Formatting error: {str(format_error)}")
-                        # Fall back to unformatted text if formatting fails
                         live.update(Text(accumulated_text))
             
-            # Get command execution confirmation
+            # Get command execution confirmation if we have commands
             if self.last_exec_command or self.last_verify_command:
                 self._get_command_confirmation()
                 
