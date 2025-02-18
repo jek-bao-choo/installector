@@ -300,6 +300,56 @@ class SimpleTerminal:
             return content
         return ""
 
+    def _extract_response_sections(self, text: str) -> dict:
+        """Extract all XML sections from the response text"""
+        return {
+            'think': self._extract_xml_section(text, 'think'),
+            'title': self._extract_xml_section(text, 'title_section'),
+            'description': self._extract_xml_section(text, 'description_section'),
+            'execution': self._extract_xml_section(text, 'execution_section'),
+            'expected': self._extract_xml_section(text, 'expected_section'),
+            'verification': self._extract_xml_section(text, 'verification_section'),
+            'conclusion': self._extract_xml_section(text, 'conclusion_section')
+        }
+
+    def _format_response_text(self, sections: dict) -> Text:
+        """Format the response sections into displayable text"""
+        formatted_text = Text()
+        
+        if sections['title']:
+            formatted_text.append(f"\n## {sections['title']}\n\n", style="bold cyan")
+        
+        if sections['description']:
+            formatted_text.append(f"{sections['description']}\n\n")
+            
+        if sections['execution']:
+            formatted_text.append(self._format_command_block(sections['execution'], 'exec'))
+            
+        if sections['expected']:
+            formatted_text.append("\nExpected Outcome:\n", style="bold yellow")
+            formatted_text.append(f"{sections['expected']}\n")
+            
+        if sections['verification']:
+            formatted_text.append(self._format_command_block(sections['verification'], 'verify'))
+            
+        if sections['conclusion']:
+            formatted_text.append(f"\n{sections['conclusion']}\n", style="italic")
+            
+        return formatted_text
+
+    def _update_system_info(self, sections: dict) -> None:
+        """Update system info with the latest response sections"""
+        if 'last_llm_response' not in self.system_info:
+            self.system_info['last_llm_response'] = {}
+        
+        self.system_info['last_llm_response'] = sections
+        
+        # Update execution and verification commands if present
+        if sections['execution']:
+            self.last_exec_command = sections['execution']
+        if sections['verification']:
+            self.last_verify_command = sections['verification']
+
     def show_streaming_output(self, generator):
         """Show streaming output with live updates and XML section parsing"""
         try:
@@ -321,53 +371,11 @@ class SimpleTerminal:
                             self.console.print(Markdown("\n## 🎉 Operation Complete!"))
                             self.console.print(Markdown("All steps have been successfully completed. Returning to menu..."))
                             return
-                            
-                        # Store response sections in system_info
-                        if 'last_llm_response' not in self.system_info:
-                            self.system_info['last_llm_response'] = {}
-                            
-                        # Extract and store each section
-                        sections = {
-                            'think': self._extract_xml_section(accumulated_text, 'think'),
-                            'title': self._extract_xml_section(accumulated_text, 'title_section'),
-                            'description': self._extract_xml_section(accumulated_text, 'description_section'),
-                            'execution': self._extract_xml_section(accumulated_text, 'execution_section'),
-                            'expected': self._extract_xml_section(accumulated_text, 'expected_section'),
-                            'verification': self._extract_xml_section(accumulated_text, 'verification_section'),
-                            'conclusion': self._extract_xml_section(accumulated_text, 'conclusion_section')
-                        }
                         
-                        self.system_info['last_llm_response'] = sections
-                        
-                        # Update execution and verification commands if present
-                        if sections['execution']:
-                            self.last_exec_command = sections['execution']
-                        if sections['verification']:
-                            self.last_verify_command = sections['verification']
-                        
-                        # Format the display text
-                        formatted_text = Text()
-                        
-                        # Add each section with appropriate formatting
-                        if sections['title']:
-                            formatted_text.append(f"\n## {sections['title']}\n\n", style="bold cyan")
-                        
-                        if sections['description']:
-                            formatted_text.append(f"{sections['description']}\n\n")
-                            
-                        if sections['execution']:
-                            formatted_text.append(self._format_command_block(sections['execution'], 'exec'))
-                            
-                        if sections['expected']:
-                            formatted_text.append("\nExpected Outcome:\n", style="bold yellow")
-                            formatted_text.append(f"{sections['expected']}\n")
-                            
-                        if sections['verification']:
-                            formatted_text.append(self._format_command_block(sections['verification'], 'verify'))
-                            
-                        if sections['conclusion']:
-                            formatted_text.append(f"\n{sections['conclusion']}\n", style="italic")
-                            
+                        # Extract and process sections
+                        sections = self._extract_response_sections(accumulated_text)
+                        self._update_system_info(sections)
+                        formatted_text = self._format_response_text(sections)
                         live.update(formatted_text)
                         
                     except Exception as format_error:
