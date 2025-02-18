@@ -48,7 +48,7 @@ def _validate_vendor_operation(system_info: Dict) -> Tuple[str, str]:
     
     return vendor.capitalize(), operation.capitalize()
 
-def format_system_info(system_info: Optional[Dict] = None) -> str:
+def format_system_info_to_xml(system_info: Optional[Dict] = None) -> str:
     """Format system information into XML format"""
     try:
         _validate_system_info(system_info)
@@ -128,7 +128,7 @@ def format_prompt(message_history: List[Dict[str, str]], system_info: Optional[D
 
         # Get formatted system information
         try:
-            system_context = format_system_info(system_info)
+            system_context = format_system_info_to_xml(system_info)
         except SystemInfoError as e:
             raise PromptGenerationError(f"Error formatting system info: {str(e)}")
         
