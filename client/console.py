@@ -69,7 +69,6 @@ class SimpleTerminal:
         self.error_color = error_color
         self.warning_color = warning_color
 
-
     def get_input(self, prompt="> ") -> Optional[str]:
         """Get input from user with completion and history"""
         try:
@@ -202,7 +201,6 @@ class SimpleTerminal:
         md = Markdown(markdown_text)
         self.console.print(md)
 
-
     def _format_command_block(self, cmd: str, block_type: str) -> Text:
         """Format a command block with proper styling
         block_type should be either 'exec' or 'verify'"""
@@ -220,9 +218,6 @@ class SimpleTerminal:
         # Add a separator line after command
         result.append('─' * 80 + '\n', style="dim")
         return result
-
-
-
 
     def _get_command_confirmation(self) -> bool:
         """Ask user to confirm if they executed the command
