@@ -231,14 +231,14 @@ class SimpleTerminal:
         result = Text()
         print("\n***DEBUG _format_exec_blocks input:", text)
         
-        # Try execution_code tags
-        parts = text.split('<execution_code>')
-        if len(parts) > 1:  # Found execution_code tags
+        # Try execution_section tags
+        parts = text.split('<execution_section>')
+        if len(parts) > 1:  # Found execution_section tags
             for i, part in enumerate(parts):
                 if i == 0:
                     result.append(part)
                 else:
-                    exec_parts = part.split('</execution_code>', 1)
+                    exec_parts = part.split('</execution_section>', 1)
                     if len(exec_parts) >= 1:
                         cmd = exec_parts[0].strip()
                         if cmd:
@@ -274,14 +274,14 @@ class SimpleTerminal:
         result = Text()
         print("\n***DEBUG _format_verify_blocks input:", text)
         
-        # Try verification_code tags
-        parts = text.split('<verification_code>')
-        if len(parts) > 1:  # Found verification_code tags
+        # Try verification_section tags
+        parts = text.split('<verification_section>')
+        if len(parts) > 1:  # Found verification_section tags
             for i, part in enumerate(parts):
                 if i == 0:
                     result.append(part)
                 else:
-                    verify_parts = part.split('</verification_code>', 1)
+                    verify_parts = part.split('</verification_section>', 1)
                     if len(verify_parts) >= 1:
                         cmd = verify_parts[0].strip()
                         if cmd:
