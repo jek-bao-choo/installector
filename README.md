@@ -15,8 +15,8 @@ uv sync
 source .venv/bin/activate
 
 # inside /installector directory but outside of /server directory.
-python -m server
-python -m client.console
+uv run -m server
+uv run -m client.console
 ```
 
 ## Log out
