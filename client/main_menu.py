@@ -16,17 +16,13 @@ class MainMenu:
             # Define options in categories
             self.categories = {
                 "# Manage an Observability Vendor agent:": [
-                    "AppDynamics Server Agent",
                     "DataDog Agent",
                     "Dynatrace OneAgent",
-                    "Grafana Agent",
                     "Splunk OpenTelemetry Collector",
                     "curl"
                 ],
                 "# Or manage an Infrastructure Vendor platform:": [
                     "Amazon EKS",
-                    "Azure AKS", 
-                    "Google GKE",
                     "Red Hat OpenShift"
                 ],
                 "# Misc": [

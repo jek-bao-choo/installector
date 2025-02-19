@@ -29,7 +29,7 @@ class MessageBroker:
             "content": content
         })
 
-        print("***DEBUG self.message_history.append: ", self.message_history)
+        # print("***DEBUG self.message_history.append: ", self.message_history)
 
     def get_response(self) -> Generator[str, None, None]:
         """Get streaming response from LLM"""
@@ -38,5 +38,5 @@ class MessageBroker:
         
         # Format messages with prompt template before sending to LLM
         formatted_messages = format_prompt(self.message_history, self.system_info)
-        print("***DEBUG get_llm_response: ", formatted_messages)
+        # print("***DEBUG get_llm_response: ", formatted_messages)
         return get_llm_response(formatted_messages)
