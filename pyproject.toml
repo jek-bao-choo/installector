@@ -1,5 +1,12 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.scripts]
+example-cli = "instalar.__main__.py:run"
+
 [project]
-name = "installector"
+name = "instalar"
 version = "0.0.1"
 description = "AI assistant for installing agent collectors in your terminal"
 readme = "README.md"

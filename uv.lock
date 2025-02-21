@@ -266,9 +266,9 @@ wheels = [
 ]
 
 [[package]]
-name = "installector"
+name = "instalar"
 version = "0.0.1"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "distro" },
     { name = "litellm" },
