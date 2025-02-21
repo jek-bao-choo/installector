@@ -1,5 +1,7 @@
+from instalar.client.console import main
+
 def run():
-    print("hello world v1")
+    exit(main())
 
 if __name__ == '__main__':
     run()

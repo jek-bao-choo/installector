@@ -3,14 +3,14 @@ import argparse
 import json
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
-from client.sysdetect import SystemTelemetryDetection
-from client.verify_execution import VerificationOutput
+from instalar.client.sysdetect import SystemTelemetryDetection
+from instalar.client.verify_execution import VerificationOutput
 from typing import Optional, Tuple
-from client.main_menu import MainMenu
-from client.obs_menu import ObsMenu
+from instalar.client.main_menu import MainMenu
+from instalar.client.obs_menu import ObsMenu
 # Import completion utilities for command auto-completion
 from prompt_toolkit.completion import Completer, Completion
-from server.message_broker import MessageBroker, MessageBrokerError
+from instalar.server.message_broker import MessageBroker, MessageBrokerError
 # Import syntax highlighting utilities
 from prompt_toolkit.lexers import PygmentsLexer
 from pygments.lexers import MarkdownLexer
@@ -431,6 +431,3 @@ def main():
         print(f"Fatal error: {str(e)}")
         return 1
     return 0
-
-if __name__ == "__main__":
-    exit(main())
