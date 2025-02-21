@@ -80,3 +80,17 @@ deactivate
 
 ## License
 This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
+
+---
+
+# Dev
+## Reminder
+- Do not attempt to automate packaging, build, and deployment i.e. CICD yet. KISS
+- POC so keep is simple!
+
+## TODO
+- try distributing it with uv such that run.sh but where to put run.sh in this project? KISS
+- think about how to use llama.cpp or ollama with this whichever lite KISS
+- Add memory. Reference how others do it. KISS
+- Add supported version to the prompt and out of support message of we notify.
+
