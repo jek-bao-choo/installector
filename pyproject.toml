@@ -2,21 +2,48 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[project.scripts]
-instalar-cli = "instalar.__main__:run"
-
 [project]
 name = "instalar"
-version = "0.0.2"
-description = "AI assistant for installing agent collectors in your terminal"
-readme = "README.md"
-requires-python = ">=3.13"
-license = { text = "GPL-3.0" }
+version = "0.0.4"
 dependencies = [
     "litellm==1.60.5",
     "prompt-toolkit>=3.0.50",
-    "pygments>=2.19.1", 
+    "pygments>=2.19.1",
     "rich>=13.9.4",
     "psutil>=5.9.0",
     "distro>=1.8.0",
 ]
+requires-python = ">=3.13"
+authors = [
+  {name = "Example", email = "example@example.com"}
+]
+description = "AI assistant for installing agent collectors in your terminal"
+readme = "README.md"
+license = { text = "GPL-3.0" }
+keywords = ["install", "agent", "opentelemetry", "observability", "monitoring"]
+classifiers = [
+  # How mature is this project? Common values are
+  #   3 - Alpha
+  #   4 - Beta
+  #   5 - Production/Stable
+  "Development Status :: 3 - Alpha"
+]
+
+[project.optional-dependencies]
+#gui = ["PyQt5"]
+cli = [
+  "rich",
+  "click",
+]
+
+[project.urls]
+Homepage = "https://example.com"
+Documentation = "https://readthedocs.org"
+Repository = "https://github.com/jek-bao-choo/installector.git"
+Changelog = "https://github.com/jek-bao-choo/installector/blob/master/CHANGELOG.md"
+
+[project.scripts]
+instalar-cli = "instalar.__main__:main_cli"
+
+#[project.gui-scripts]
+#instalar-gui = "instalar.__main__:main_gui"
