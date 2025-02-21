@@ -1,5 +1,5 @@
 from typing import List, Dict, Optional, Tuple
-from server.obs_base_prompt import get_base_prompt
+from src.instalar.server.obs_base_prompt import get_base_prompt
 
 class PromptGenerationError(Exception):
     """Base exception for prompt generation errors"""

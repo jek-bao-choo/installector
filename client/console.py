@@ -10,7 +10,7 @@ from client.main_menu import MainMenu
 from client.obs_menu import ObsMenu
 # Import completion utilities for command auto-completion
 from prompt_toolkit.completion import Completer, Completion
-from server.message_broker import MessageBroker, MessageBrokerError
+from src.instalar.server.message_broker import MessageBroker, MessageBrokerError
 # Import syntax highlighting utilities
 from prompt_toolkit.lexers import PygmentsLexer
 from pygments.lexers import MarkdownLexer
