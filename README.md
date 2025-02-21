@@ -12,15 +12,61 @@ cd installector
 cd installector
 uv tree
 uv sync
-source .venv/bin/activate
 
-# inside /installector directory but outside of /server directory.
-uv run -m server
-uv run -m client.console
+# optional
+source .venv/bin/activate
 ```
 
-## Log out
+## Run
 ```bash
+# inside /installector directory but outside of /src directory.
+# For dev
+uv run -m instalar
+
+# for Dev
+uv run src/instalar/__main__.py
+
+# Only if it has been published to PyPI
+uv tool run -i https://test.pypi.org/simple/ --from instalar instalar-cli 
+```
+
+## Build
+```bash
+# Wheel only
+uv build --wheel
+
+# Wheel and tar.gz
+uv build
+```
+
+## Publish (optional)
+```bash
+uvx twine upload --repository testpypi dist/* `
+
+# uv publish...
+```
+
+## Install
+```bash
+# Change the version accordingly
+# Install Instalar from wheel
+uv tool install dist/example_package_jekbao-0.0.1-py3-none-any.whl
+
+# See if Instalar is installed
+uv tool list
+
+# Step 3: Use Instalar
+instalar-cli
+```
+
+## Clean up or log out
+```bash
+uv tool list
+
+uv tool uninstall instalar
+
+rm -rf dist
+
 deactivate  
 ```
 
@@ -34,4 +80,3 @@ deactivate
 
 ## License
 This project is licensed under the GNU General Public License v3.0 - see the LICENSE file for details.
-

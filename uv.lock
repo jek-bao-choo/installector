@@ -267,7 +267,7 @@ wheels = [
 
 [[package]]
 name = "instalar"
-version = "0.0.1"
+version = "0.0.4"
 source = { editable = "." }
 dependencies = [
     { name = "distro" },
@@ -278,14 +278,22 @@ dependencies = [
     { name = "rich" },
 ]
 
+[package.optional-dependencies]
+cli = [
+    { name = "click" },
+    { name = "rich" },
+]
+
 [package.metadata]
 requires-dist = [
+    { name = "click", marker = "extra == 'cli'" },
     { name = "distro", specifier = ">=1.8.0" },
     { name = "litellm", specifier = "==1.60.5" },
     { name = "prompt-toolkit", specifier = ">=3.0.50" },
     { name = "psutil", specifier = ">=5.9.0" },
     { name = "pygments", specifier = ">=2.19.1" },
     { name = "rich", specifier = ">=13.9.4" },
+    { name = "rich", marker = "extra == 'cli'" },
 ]
 
 [[package]]
