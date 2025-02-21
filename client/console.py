@@ -3,7 +3,7 @@ import argparse
 import json
 # Import prompt_toolkit for enhanced command line interface
 from prompt_toolkit import PromptSession
-from client.sysdetect import SystemTelemetryDetection, SystemDetectionError
+from client.sysdetect import SystemTelemetryDetection
 from client.verify_execution import VerificationOutput
 from typing import Optional, Tuple
 from client.main_menu import MainMenu
