@@ -16,15 +16,26 @@ installector/
 ├── scripts/                    # Distribution helper scripts (e.g. run.sh)
 │   └── run.sh                 # Script that installs the wheel using uv for MacOS and Linux. Verify that the uv executable (from your /bin folder) is available, install the wheel using the uv executable.
 │   └── run.ps1                 # Script that installs the wheel using uv for Windows
-├── bin/                        # Additional executables you want to distribute
+├── bin/                        # Additional executables you want to distribute. Excluded from committing to git.
 │   └── uv                     # The uv executable (from Astral). Although the uv executable and run.sh are not part of the Python package per se, they are essential for your distribution. Keep these files in your repository but do not include them in the wheel. Instead, they will be distributed as release assets alongside the wheel.
+│   └── ollama-darwin-v0.5.12/  # The ollama for macOS manually downloaded (ollama-darwin.tgz) from https://github.com/ollama/ollama/releases and suffix with version tag
+│       ├── ...
+│       └── ollama              # Ollama executable
 ├── pyproject.toml              # Modern build configuration. Create a Git tag for your release. This tag should correspond to your version in pyproject.toml.
 ├── README.md
 ├── .gitignore                  # Make sure /dist is ignored in version control
 └── dist/                      # Build artifacts (wheel file, etc.)
 ```
 
-## Initial setup
+## Initial Ollama setup
+```bash
+./bin/ollama-darwin-v0.5.12/ollama serve
+
+# open up another terminal
+./bin/ollama-darwin-v0.5.12/ollama run deepseek-r1:1.5b
+```
+
+## Initial project setup
 ```bash
 # uv init not only create a ".venv", but also a pyproject.toml, a git repo (with Python-specific .gitignore), a README.md and a hello.py by default. 
 uv init installector
@@ -151,6 +162,7 @@ This project is licensed under the GNU General Public License v3.0 - see the LIC
 ## TODO
 - think about how to use llama.cpp or ollama with this whichever lite KISS
 - Add memory. Reference how others do it. KISS
+- Understand how to resolve the dependencies issue of PyPI when missing. Or can we build the dependencies on build to have certainty?
 - Add supported version to the prompt and out of support message of we notify.
 - Think about repomix and docling for RAG. KISS.
 

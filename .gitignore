@@ -175,3 +175,6 @@ __pycache__
 *.pyc
 .venv
 .aider*
+
+# Bin
+bin/
