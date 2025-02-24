@@ -57,14 +57,14 @@ info "uv version ${UV_VERSION} is ready"
 info "Checking if instalar is installed..."
 if uv tool list | grep -q "instalar"; then
     info "instalar is already installed, checking for updates..."
-    if uv tool upgrade instalar; then
+    if uv tool upgrade -i https://test.pypi.org/simple/ instalar; then
         info "instalar has been upgraded successfully"
     else
         info "instalar is already at the latest version"
     fi
 else
     info "Installing instalar..."
-    if uv tool run -i https://test.pypi.org/simple/ --from instalar instalar-cli; then
+    if uv tool install -i https://test.pypi.org/simple/ instalar; then
         info "instalar installed successfully"
     else
         error "Failed to install instalar"
