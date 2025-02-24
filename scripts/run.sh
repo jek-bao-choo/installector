@@ -81,3 +81,10 @@ fi
 INSTALAR_VERSION=$(uv tool list | grep "instalar" | awk '{print $2}')
 info "instalar version ${INSTALAR_VERSION} is ready"
 
+# Start instalar-cli
+info "Starting instalar-cli..."
+if ! instalar-cli; then
+    error "Failed to start instalar-cli"
+    exit 1
+fi
+
