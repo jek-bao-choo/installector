@@ -40,8 +40,8 @@ uv tool run -i https://test.pypi.org/simple/ --from instalar instalar-cli
 ## Build
 ```bash
 # uv remove actually cleans up your repo correctly.
-uv remove
 
+# Clear cache to optimise storage
 uv cache clean
 
 # uv build create a .whl package out of your project, but uv doesn't require your project to be able to be built.
