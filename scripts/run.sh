@@ -53,3 +53,31 @@ fi
 UV_VERSION=$(uv --version)
 info "uv version ${UV_VERSION} is ready"
 
+# Check if instalar is installed
+info "Checking if instalar is installed..."
+if uv tool list | grep -q "instalar"; then
+    info "instalar is already installed, checking for updates..."
+    if uv tool upgrade instalar; then
+        info "instalar has been upgraded successfully"
+    else
+        info "instalar is already at the latest version"
+    fi
+else
+    info "Installing instalar..."
+    if uv tool run -i https://test.pypi.org/simple/ --from instalar instalar-cli; then
+        info "instalar installed successfully"
+    else
+        error "Failed to install instalar"
+        exit 1
+    fi
+fi
+
+# Verify instalar installation
+if ! uv tool list | grep -q "instalar"; then
+    error "instalar installation verification failed"
+    exit 1
+fi
+
+INSTALAR_VERSION=$(uv tool list | grep "instalar" | awk '{print $2}')
+info "instalar version ${INSTALAR_VERSION} is ready"
+
