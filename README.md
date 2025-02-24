@@ -1,6 +1,29 @@
 # Installector
 Installector is AI assistant for installing agent collectors in your terminal.
 
+## Project Structure
+```
+installector/
+├── .github/                    # GitHub Actions workflows, issue templates, etc.
+├── src/
+│   └── instalar/             # Your Python package code
+│       ├── client/
+│       ├── server/
+│       ├── __init__.py
+│       └── main.py
+├── tests/                      # Your test suite
+│   └── test_main.py
+├── scripts/                    # Distribution helper scripts (e.g. run.sh)
+│   └── run.sh                 # Script that installs the wheel using uv for MacOS and Linux. Verify that the uv executable (from your /bin folder) is available, install the wheel using the uv executable.
+│   └── run.ps1                 # Script that installs the wheel using uv for Windows
+├── bin/                        # Additional executables you want to distribute
+│   └── uv                     # The uv executable (from Astral). Although the uv executable and run.sh are not part of the Python package per se, they are essential for your distribution. Keep these files in your repository but do not include them in the wheel. Instead, they will be distributed as release assets alongside the wheel.
+├── pyproject.toml              # Modern build configuration. Create a Git tag for your release. This tag should correspond to your version in pyproject.toml.
+├── README.md
+├── .gitignore                  # Make sure /dist is ignored in version control
+└── dist/                      # Build artifacts (wheel file, etc.)
+```
+
 ## Initial setup
 ```bash
 # uv init not only create a ".venv", but also a pyproject.toml, a git repo (with Python-specific .gitignore), a README.md and a hello.py by default. 
@@ -33,7 +56,7 @@ uv run -m instalar
 # for Dev
 uv run src/instalar/__main__.py
 
-# Only if it has been published to PyPI
+# Only if it has been published to PyPI Test
 uv tool run -i https://test.pypi.org/simple/ --from instalar instalar-cli 
 ```
 
@@ -43,6 +66,8 @@ uv tool run -i https://test.pypi.org/simple/ --from instalar instalar-cli
 
 # Clear cache to optimise storage
 uv cache clean
+
+rm -rf dist
 
 # uv build create a .whl package out of your project, but uv doesn't require your project to be able to be built.
 # Wheel only
@@ -54,7 +79,7 @@ uv build
 
 ## Publish (optional)
 ```bash
-uvx twine upload --repository testpypi dist/* `
+uvx twine upload --repository testpypi dist/*
 
 # uv publish...
 ```
@@ -63,7 +88,7 @@ uvx twine upload --repository testpypi dist/* `
 ```bash
 # Change the version accordingly
 # Install Instalar from wheel
-uv tool install dist/example_package_jekbao-0.0.1-py3-none-any.whl
+uv tool install dist/instalar-0.0.1-py3-none-any.whl
 
 # See if Instalar is installed
 uv tool list
@@ -72,9 +97,23 @@ uv tool list
 instalar-cli
 ```
 
+## Test run.sh
+```
+......scripts/run.sh | sh
+```
+
 ## Upgrade
 ```bash
 # uv lock --upgrade-package <package>==<version> let you upgrade carefully your packages one version at a time.
+```
+
+## Build automation
+```bash
+# Use GitHub Actions to trigger a workflow on tag creation.
+# The workflow should build your package (generating the wheel file in /dist), and then collect the artifacts (wheel file, run.sh, and uv executable) as assets.
+# Do not commit build artifacts (like the wheel) to your repository. Instead, attach them as assets to your GitHub release.
+# Ensure your release notes describe how to use the run.sh script to perform the installation and mention any prerequisites (e.g., needing execution permissions for uv).
+# attach the wheel file, run.sh, and the uv executable as release assets.
 ```
 
 ## Clean up or log out
@@ -110,9 +149,9 @@ This project is licensed under the GNU General Public License v3.0 - see the LIC
 - Usage in air gapped environment
 
 ## TODO
-- try distributing it with uv such that run.sh but where to put run.sh in this project? KISS
 - think about how to use llama.cpp or ollama with this whichever lite KISS
 - Add memory. Reference how others do it. KISS
 - Add supported version to the prompt and out of support message of we notify.
+- Think about repomix and docling for RAG. KISS.
 
 

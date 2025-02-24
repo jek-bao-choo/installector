@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "instalar"
-version = "0.0.4"
+version = "0.0.10"
 dependencies = [
     "litellm==1.60.5",
     "prompt-toolkit>=3.0.50",
@@ -20,13 +20,13 @@ authors = [
 description = "AI assistant for installing agent collectors in your terminal"
 readme = "README.md"
 license = { text = "GPL-3.0" }
-keywords = ["install", "agent", "opentelemetry", "observability", "monitoring"]
+keywords = ["install", "setup", "telemetry", "agent", "opentelemetry", "observability", "monitoring"]
 classifiers = [
-  # How mature is this project? Common values are
-  #   3 - Alpha
-  #   4 - Beta
-  #   5 - Production/Stable
-  "Development Status :: 3 - Alpha"
+    "Development Status :: 1 - Planning",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: System :: Installation/Setup"
 ]
 
 [project.optional-dependencies]
