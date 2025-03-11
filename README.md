@@ -27,12 +27,26 @@ installector/
 └── dist/                      # Build artifacts (wheel file, etc.)
 ```
 
-## Initial Ollama setup
-```bash
-./bin/ollama-darwin-v0.5.12/ollama serve
+## Initial Llama.cpp setup
 
-# open up another terminal
-./bin/ollama-darwin-v0.5.12/ollama run deepseek-r1:1.5b
+* Download the model from HuggingFace in GGUF format. For example, I like Unsloth's https://huggingface.co/collections/unsloth/deepseek-r1-all-versions-678e1c48f5d2fce87892ace5
+  * Put the downloaded model into folder /models
+  * optional: Read about GGUF part 1 https://huggingface.co/docs/hub/en/gguf 
+  * optional: Read about GGUF part 2https://github.com/ggml-org/ggml/blob/master/docs/gguf.md
+  * 
+* Download llama.cpp pre-built binaries from Github release https://github.com/ggml-org/llama.cpp/releases
+  * Read about llama.cpp's llama-server from https://github.com/ggml-org/llama.cpp/tree/master/examples/server
+  * Unzip the content and execute it
+
+```bash
+# First terminal - start the llama-server
+./llama-server -m models/7B/ggml-model.gguf -c 2048
+
+# Second terminal - test the llama-server
+curl --request POST \     
+    --url http://localhost:8080/completion \
+    --header "Content-Type: application/json" \
+    --data '{"prompt": "Why is the sky blue?","n_predict": 128}'
 ```
 
 ## Initial project setup
@@ -160,7 +174,7 @@ This project is licensed under the GNU General Public License v3.0 - see the LIC
 - Usage in air gapped environment
 
 ## TODO
-- think about how to use llama.cpp or ollama with this whichever lite KISS
+- Add graceful start and stop and restart and error handling into python script or shell script. So who handles it?
 - Add memory. Reference how others do it. KISS
 - Understand how to resolve the dependencies issue of PyPI when missing. Or can we build the dependencies on build to have certainty?
 - Add supported version to the prompt and out of support message of we notify.
