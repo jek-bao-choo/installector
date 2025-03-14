@@ -85,6 +85,12 @@ uv run src/instalar/__main__.py
 uv tool run -i https://test.pypi.org/simple/ --from instalar instalar-cli 
 ```
 
+## Lint
+```bash
+uvx ruff check   # Lint all files in the current directory.
+uvx ruff format  # Format all files in the current directory.
+```
+
 ## Build
 ```bash
 # uv remove actually cleans up your repo correctly.
@@ -174,8 +180,8 @@ This project is licensed under the GNU General Public License v3.0 - see the LIC
 - Usage in air gapped environment
 
 ## TODO
-- Add graceful start and stop and restart and error handling into python script or shell script. So who handles it?
-- Add memory. Reference how others do it. KISS
+- Revert to testing out llama-cpp's llama-server with Hello World and packaging.
+- Add memory. Reference how others do it. KISS. Mem0?
 - Understand how to resolve the dependencies issue of PyPI when missing. Or can we build the dependencies on build to have certainty?
 - Add supported version to the prompt and out of support message of we notify.
 - Think about repomix and docling for RAG. KISS.
