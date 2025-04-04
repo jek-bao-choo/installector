@@ -179,8 +179,16 @@ This project is licensed under the GNU General Public License v3.0 - see the LIC
 ## Consideration
 - Usage in air gapped environment
 
+## Decision
+
+### llama-cpp-python vs. llama.cpp's llama-server vs. ollama
+- Though llama-cpp-python is not actively maintained, it is a straightforward to POC this app.
+- llama.cpp's llama-server is my preferred approach but it takes a bit more time to POC this app.
+- ollama has huge download size.
+For now, I am using llama-cpp-python to move fast. 
+
 ## TODO
-- Revert to testing out llama-cpp's llama-server with Hello World and packaging.
+- Add llama-cpp-python to llm.py.
 - Add memory. Reference how others do it. KISS. Mem0?
 - Understand how to resolve the dependencies issue of PyPI when missing. Or can we build the dependencies on build to have certainty?
 - Add supported version to the prompt and out of support message of we notify.
