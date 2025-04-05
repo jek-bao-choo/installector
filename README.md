@@ -187,8 +187,17 @@ This project is licensed under the GNU General Public License v3.0 - see the LIC
 - ollama has huge download size.
 For now, I am using llama-cpp-python to move fast. 
 
+### Current challenges
+- Hard to debug as the code gets complicated and mostly written by GenAI. It takes a lot of time to review it thoroughly.
+- As such, I need to modularise at the beginning. 
+- Modularise the server. One option is to go with llama.cpp's llama-server. Because it is well maintained and it separate the responsibility for testing.
+- Another approach is to consider the TDD.
+
 ## TODO
-- Add llama-cpp-python to llm.py.
+- Start a Hello World with llama.cpp's llama-server that is subprocess by Python.
+- Test it in a Linux environment.
+- Once successful, refactor llm.py to use it.
+- In additional, need to think of ways to simplify the client so that it can be tested individually.
 - Add memory. Reference how others do it. KISS. Mem0?
 - Understand how to resolve the dependencies issue of PyPI when missing. Or can we build the dependencies on build to have certainty?
 - Add supported version to the prompt and out of support message of we notify.
